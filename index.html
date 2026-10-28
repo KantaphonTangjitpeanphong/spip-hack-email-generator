@@ -1,25 +1,107 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SPIP Hack Letter Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
 <script src="config.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eceaf0;color:#1c1b22;display:grid;grid-template-columns:430px minmax(0,1fr);height:100vh}
-#ui{background:#fff;border-right:1px solid #d6d3de;overflow:auto;padding:22px 20px 40px} input,select,textarea{font-size:14px;padding:10px;line-height:1.4} label{font-size:13px} h2{font-size:12px;color:#555160} p.sub{font-size:13px;line-height:1.45}
-h1{font-size:18px;margin:0 0 2px}p.sub{margin:0 0 14px;color:#6b6877;font-size:13px}
-h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b6877;margin:20px 0 8px}
-.parties{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.party{border:2px solid #d6d3de;background:#fff;border-radius:10px;padding:10px;text-align:left;font:600 13px Arial;cursor:pointer;line-height:1.3}
-.party small{display:block;font-weight:400;color:#6b6877;margin-top:3px;font-size:11px}
-.party.on{border-color:#c2306e;background:#fdf1f6}
-label{display:block;font-size:12px;color:#44414f;margin:9px 0 3px}
-input,select,textarea{width:100%;padding:8px;border:1px solid #c9c6d2;border-radius:6px;font:13px Arial}
-textarea{resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.chk{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:13px}.chk input{width:auto}
-button.act{padding:10px 12px;border:0;border-radius:8px;font:700 13px Arial;cursor:pointer;background:#c2306e;color:#fff}
-button.sec{padding:8px 10px;border:1px solid #c9c6d2;border-radius:8px;font:600 12px Arial;cursor:pointer;background:#fff}
-.bar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.note{font-size:12px;color:#8a4b00;background:#fff6e5;border-radius:6px;padding:8px;margin-top:8px}
-#pv{overflow:auto;padding:28px 24px;background:#f0eff3;min-width:0}
+*{box-sizing:border-box}
+/* Brand tokens from SpipHack27_LandingPage css/style.css :root, inverted for a light page */
+:root{--purple:#4B3F78;--magenta:#C4449A;--orange:#F2622A;--red:#E8141C;--cyan:#2EE6C8;--teal:#16968A;--on-cyan:#04211D;
+--grad-brand:linear-gradient(120deg,var(--purple) 0%,var(--magenta) 50%,var(--orange) 100%);
+--font-display:"Kanit","IBM Plex Sans Thai","Leelawadee UI","Thonburi","Sukhumvit Set","Noto Sans Thai",system-ui,sans-serif;
+--font-body:"IBM Plex Sans Thai","Leelawadee UI","Segoe UI","Thonburi","Sukhumvit Set","Noto Sans Thai",-apple-system,system-ui,sans-serif;
+--ink:#1B1630;--muted:#6B6784;--line:#E6E4EE;--line-strong:#CFCBDC;--bg:#FAFAFC;--r:24px;--r-sm:14px;--r-pill:999px;--ease:cubic-bezier(.2,.7,.2,1);--gx:24px}
+body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink);display:grid;grid-template-columns:480px minmax(0,1fr);height:100vh}
+#ui{position:relative;background:var(--bg);border-right:1px solid var(--line);overflow:auto;padding:0 var(--gx);scroll-padding-top:70px;line-height:1.5;font-size:14px}
+#ui :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.hd{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;margin:0 calc(-1*var(--gx));padding:26px var(--gx) 14px}
+.hd::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--grad-brand)}
+.hd .blob{position:absolute;top:-70px;right:-60px;width:280px;height:200px;border-radius:50%;background:var(--grad-brand);filter:blur(60px);opacity:.13;pointer-events:none}
+.hd .lg{flex:none;width:123px;height:40px;overflow:hidden;position:relative}
+.hd .lg img{position:absolute;height:88px;width:auto;left:-47px;top:-24px}
+.hd h1{margin:0;font:700 21px/1.15 var(--font-display);letter-spacing:.01em;color:var(--ink)}
+.hd h1 span{background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hd h1::after{content:"";display:block;width:42px;height:3px;border-radius:3px;background:var(--grad-brand);margin-top:6px}
+#ui p.sub{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+.steps{position:sticky;top:0;z-index:6;display:flex;gap:4px;margin:0 calc(-1*var(--gx));padding:10px var(--gx) 12px;background:rgba(250,250,252,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.steps::before,.steps::after{content:"";position:absolute;left:var(--gx);right:var(--gx);bottom:4px;height:2px;border-radius:2px;background:var(--line)}
+.steps::after{right:auto;width:calc((100% - 2*var(--gx))*var(--p,0));background:var(--grad-brand);transition:width .35s var(--ease)}
+.steps a{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:4px 6px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:500;white-space:nowrap}
+.steps a b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;background:#EFEDF5;color:var(--muted)}
+.steps a:hover{background:#F1EFF7;color:var(--ink)}
+.steps a.on{color:var(--ink);font-weight:600}.steps a.on b{background:var(--grad-brand);color:#fff}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin:14px 0;box-shadow:0 1px 2px rgba(27,22,48,.04),0 14px 34px -26px rgba(75,63,120,.35)}
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#ui h2{display:flex;align-items:center;gap:10px;margin:0 0 6px;font:600 16px/1.3 var(--font-display);letter-spacing:.01em;color:var(--ink);text-transform:none}
+#ui h2 .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--grad-brand);color:#fff;font:600 12px var(--font-body)}
+#roles h2{font:500 13px var(--font-body)!important;color:var(--muted)!important;margin:16px 0 2px!important}
+.parties{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.party{position:relative;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:14px 34px 14px 14px;text-align:left;font:600 14px/1.3 var(--font-body);color:var(--ink);cursor:pointer;min-height:72px;transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s}
+.party small{display:block;font-weight:400;color:var(--muted);margin-top:4px;font-size:12px}
+.party:hover{transform:translateY(-1px);border-color:var(--line-strong);box-shadow:0 10px 22px -14px rgba(196,68,154,.5)}
+.party.on{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad-brand) border-box;box-shadow:0 12px 26px -16px rgba(196,68,154,.65)}
+.party.on::after{content:"✓";position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;background:var(--grad-brand);color:#fff;font-size:11px;line-height:18px;text-align:center}
+.lang-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.lang-row .lbl{font-size:13px;font-weight:500;color:#3A3550}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:var(--r-pill);background:#F1EFF7;border:1px solid var(--line)}
+.seg button{border:0;background:none;min-height:34px;padding:6px 14px;border-radius:var(--r-pill);font:500 13px var(--font-body);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(27,22,48,.12),inset 0 -2px 0 var(--magenta)}
+#ui[data-lang="en"] [data-l="th"],#ui[data-lang="th"] [data-l="en"]{display:none}
+#ui label{display:block;font-size:13px;font-weight:500;color:#3A3550;margin:12px 0 5px}
+#ui label .opt,.more summary .opt{font-weight:400;color:var(--muted);font-size:12px}
+#ui input,#ui select,#ui textarea{width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;font:14px/1.5 var(--font-body);color:var(--ink);background:#fff;transition:border-color .15s,box-shadow .15s}
+#ui input:hover,#ui select:hover,#ui textarea:hover{border-color:#B9B4CB}
+#ui input:focus,#ui select:focus,#ui textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(46,230,200,.35);outline:none}
+#ui input:user-invalid{border-color:var(--orange)}
+#ui textarea{resize:vertical;line-height:1.6}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));column-gap:10px}
+.name-row{display:grid;grid-template-columns:110px minmax(0,1fr);column-gap:10px}.name-row>[data-l="th"]{grid-column:2}
+#ui .chk{display:flex;gap:10px;align-items:center;margin:10px 0;font-size:13.5px;font-weight:400;color:var(--ink);cursor:pointer}
+#ui .chk input{width:18px;height:18px;margin:0;flex:none;accent-color:var(--magenta)}
+#ui .chk input[type=range]{width:auto;flex:1;height:auto;padding:0;border:0;box-shadow:none}
+#roles .chk{min-height:32px}
+.help,.mini{display:block;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+.more{margin-top:14px;border:1px dashed var(--line-strong);border-radius:var(--r-sm);padding:0 14px}
+.more[open]{border-style:solid;border-color:var(--line);background:#FCFBFE;padding-bottom:12px}
+.more summary{cursor:pointer;list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-height:44px;font-weight:600;font-size:13.5px;color:var(--purple)}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"+";width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#F1EFF7;font-weight:600}
+.more[open] summary::before{content:"–"}
+.more .sum{flex-basis:100%;font-weight:400;font-size:12px;color:var(--muted);margin:-6px 0 8px 28px}
+.more[open] .sum{display:none}.more .sum .warn{color:#A3360F;font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:500;background:#F1EFF7;color:var(--muted);border:1px solid var(--line)}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#B9B4CB}
+.badge.mine{background:#E9FCF8;color:var(--on-cyan);border-color:#A8EFE3}.badge.mine::before{background:var(--teal)}
+.badge.edit{background:#FFF3EC;color:#8A2E0A;border-color:#F8C9B2}.badge.edit::before{background:var(--orange)}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px}.chips .mini{margin:0 2px 0 0}
+.chip{border:1px solid var(--line-strong);background:#fff;color:var(--purple);border-radius:var(--r-pill);padding:5px 10px;min-height:30px;font:500 12px ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer;transition:background .15s,border-color .15s}
+.chip:hover{background:#F6F1FA;border-color:var(--magenta)}
+button.act{flex:1;min-height:46px;padding:12px 18px;border:0;border-radius:var(--r-pill);font:600 14.5px var(--font-body);cursor:pointer;background:var(--grad-brand);color:#fff;box-shadow:0 8px 20px -10px rgba(196,68,154,.7);transition:transform .2s var(--ease),box-shadow .2s var(--ease),opacity .2s}
+button.act:hover:not(:disabled){transform:scale(1.02);box-shadow:0 12px 28px -10px rgba(196,68,154,.85),0 0 0 4px rgba(196,68,154,.10)}
+button.act:disabled{opacity:.7;cursor:progress}
+button.sec,button.sec2{min-height:40px;padding:8px 14px;border:1px solid var(--line-strong);border-radius:var(--r-pill);font:600 13px var(--font-body);cursor:pointer;background:#fff;color:var(--ink);transition:border-color .15s,background .15s,transform .2s var(--ease)}
+button.sec:hover,button.sec2:hover{border-color:var(--purple);background:#FAF8FD}
+button.sec2{min-height:46px;padding:10px 16px}
+button.sec.warn{border-color:var(--red);color:#B0101A;background:#FFF2F2}
+button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);font-weight:600;text-decoration:underline;cursor:pointer}
+.bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+#tplMsg{margin:0 0 0 4px}#tplMsg.err{color:#B0101A}
+.note{font-size:12px;color:#8a4b00;background:#fff6e5;border-radius:10px;padding:10px;margin-top:10px}
+.actions{position:sticky;bottom:0;z-index:5;margin:14px calc(-1*var(--gx)) 0;padding:12px var(--gx) 14px;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line);box-shadow:0 -10px 24px -20px rgba(27,22,48,.4)}
+.actions .bar{margin-top:0}
+.status{font-size:13px;line-height:1.45;padding:9px 12px;border-radius:12px;margin-bottom:10px;border:1px solid var(--line);background:#F6F5FA;overflow-wrap:anywhere}
+.status.ok{background:#E9FCF8;border-color:#A8EFE3;color:var(--on-cyan)}
+.status.err{background:#FFF2F2;border-color:#F3B4B7;color:#8E0F16}
+.status a{color:inherit;font-weight:600}
+.tip{margin-top:8px;font-size:12px;color:var(--muted)}.tip summary{cursor:pointer;width:fit-content}.tip p{margin:6px 0 0}
+.pvjump{display:none}
+.toast{position:fixed;left:calc(var(--gx) + 8px);bottom:150px;z-index:20;max-width:380px;padding:10px 14px;border-radius:12px;background:var(--ink);color:#fff;font-size:13px;box-shadow:0 12px 30px -12px rgba(27,22,48,.6);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s var(--ease);pointer-events:none}
+.toast.show{opacity:1;transform:none}
+#pv::before{content:"Live preview · matches the PDF";display:block;text-align:center;font:500 12px var(--font-body);letter-spacing:.04em;color:var(--muted);margin:-14px 0 12px}
+@media (prefers-reduced-motion:reduce){#ui *{transition:none!important}}
+#pv{overflow:auto;padding:28px 24px;background:#F1F0F6;min-width:0}
 .sheet{width:210mm;height:297mm;overflow:hidden;margin:0 auto;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.18);padding:16mm 23mm 17mm;display:flex;flex-direction:column;font-size:11.5pt;line-height:1.58;color:#000}
 .sheet .logo{text-align:center}.sheet .logo img{width:112mm;max-width:100%;height:auto;display:block;margin:0 auto}
 .meta{display:flex;justify-content:space-between;margin-top:8mm;font-size:10.5pt}
@@ -37,55 +119,84 @@ button.sec{padding:8px 10px;border:1px solid #c9c6d2;border-radius:8px;font:600 
 .th{font-family:'TH Sarabun New',Sarabun,Thonburi,Tahoma,'Noto Sans Thai',sans-serif;font-size:12pt;line-height:1.55}
 .sheet+.sheet{margin-top:24px}
 
-@media screen and (max-width:1050px){body{grid-template-columns:360px minmax(0,1fr)}#pv{padding:16px}.sheet{transform-origin:top center}}
-@media screen and (max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh}#ui{width:100%;max-height:none;overflow:visible;border-right:0;border-bottom:1px solid #d6d3de}#pv{overflow:auto;padding:12px}.sheet{margin:0;width:210mm;height:297mm}}
+@media screen and (max-width:1050px){body{grid-template-columns:400px minmax(0,1fr)}#pv{padding:16px}.sheet{transform-origin:top center}}
+@media screen and (max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh}#ui{width:100%;max-height:none;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}#pv{overflow:auto;padding:12px}.sheet{margin:0;width:210mm;height:297mm}:root{--gx:16px}html{scroll-padding-top:70px}.pvjump{display:inline-block}#pv::before{margin:0 0 10px;text-align:left}.toast{bottom:170px;right:var(--gx)}}
+@media screen and (max-width:420px){.parties{grid-template-columns:1fr}.party{min-height:0}.steps a{font-size:11.5px;gap:4px;padding:4px 2px}.steps a b{width:18px;height:18px}.name-row{grid-template-columns:92px minmax(0,1fr)}.actions .act{flex-basis:100%}.actions .sec2{flex:1}}
 @media print{
   @page { size: A4; margin: 0; }
   html, body { margin: 0; padding: 0; width: 210mm; background: #fff; display: block; height: auto; }
   #ui { display: none !important; }
+  #pv::before { display: none !important; }
   #pv { padding: 0; margin: 0; overflow: visible; width: 210mm; }
   .sheet { box-shadow: none; margin: 0; width: 210mm; height: 297mm; break-inside: avoid; }
   .sheet + .sheet { page-break-before: always; break-before: page; margin-top: 0; }
 }
 </style></head><body>
-<div id="ui">
-<h1>SPIP Hack Letter Maker</h1><p class="sub">Pick who the letter is for, fill the boxes, then Save as PDF.</p>
-<h2>1 · Who is it for?</h2>
+<div id="ui" data-lang="en">
+<header class="hd"><div class="blob" aria-hidden="true"></div><div class="lg"><img id="hdLogo" alt="SPIP Hack 2027"></div><div><h1><span>Letter Maker</span></h1><p class="sub">Choose a recipient type to start.</p></div></header>
+<nav class="steps" aria-label="Form sections"><a href="#secRcpt" data-s="secRcpt"><b>1</b>Recipient</a><a href="#secDet" data-s="secDet"><b>2</b>Details</a><a href="#secSig" data-s="secSig"><b>3</b>Signatures</a><a href="#secTxt" data-s="secTxt"><b>4</b>Text</a></nav>
+<section class="card" id="secStart" aria-labelledby="whoH">
+<h2 id="whoH">Who is it for?</h2>
 <div class="parties" id="parties"></div>
-<h2>2 · Recipient</h2>
-<label>Addressing style</label><select id="addresseeMode"><option value="named">Named recipient</option><option value="generic">To Whom It May Concern</option><option value="team">Team / Department</option></select>
-<div id="namedFields">
-<div class="two"><div><label>Title</label><select id="sal"><option>Mr.</option><option>Ms.</option><option>Mrs.</option><option>Dr.</option><option>Prof.</option><option>Assoc. Prof.</option><option>Khun</option><option>คุณ</option><option>ดร.</option><option>ศ.</option><option>รศ.</option><option>ผศ.</option><option>ท่าน</option><option></option></select></div>
-<div><label>Full name (English)</label><input id="nameEn" placeholder="Name Surname"></div></div>
-<label>Full name (Thai)</label><input id="nameTh" class="th" placeholder="ชื่อ-นามสกุล">
-</div>
-<label id="posL">Position (English)</label><input id="positionEn" placeholder="e.g. Director of ...">
-<label>Position (Thai)</label><input id="positionTh" class="th" placeholder="ตำแหน่ง">
-<label id="orgL">Organisation / School (English)</label><input id="orgEn" placeholder="Organisation">
-<label>Organisation / School (Thai)</label><input id="orgTh" class="th" placeholder="องค์กร / โรงเรียน">
-<label>Address (English, optional; one line per row)</label><textarea id="addrEn" rows="2"></textarea>
-<label>Address (Thai, optional; one line per row)</label><textarea id="addrTh" class="th" rows="2"></textarea>
 <div id="roles"></div>
-<h2>3 · Letter details</h2>
-<div class="two"><div><label>Date</label><input type="date" id="date"></div><div><label>Reference no. (optional)</label><input id="ref" placeholder="Only if officially assigned"></div></div>
-<p class="sub">Use a reference number only if the school or supervising staff has approved/assigned one.</p>
-<div class="two"><div><label>Language</label><select id="lay"><option value="en">English</option><option value="th">ไทย (Thai)</option><option value="both">Both (English + Thai)</option></select></div><div><label>Watermark (strength)</label><div class="chk"><input type="checkbox" id="wm" checked><input type="range" id="wmo" min="3" max="20" value="8"></div></div></div>
-<div class="two"><div><label>Please reply by</label><input id="reply" placeholder="e.g. 15 November 2026"></div><div><label>Enclosures</label><input id="enc"></div></div>
-<h2>4 · Signatures</h2>
-<div class="two"><div><label>Signatory name (English)</label><input id="s1nEn"></div><div><label>Signatory name (Thai)</label><input id="s1nTh"></div></div>
-<label>Position</label><input id="s1p">
-<div class="chk"><input type="checkbox" id="s2on"><span>Add a second signatory (e.g. supervising teacher)</span></div>
-<div id="s2box" style="display:none"><div class="two"><div><label>Second name (English)</label><input id="s2nEn"></div><div><label>Second name (Thai)</label><input id="s2nTh"></div></div><label>Position</label><input id="s2p"></div>
-<div class="chk"><input type="checkbox" id="stamp"><span>Leave an area for the school stamp</span></div>
-<h2>5 · Letter text</h2>
-<label>Subject</label><input id="subj">
-<label>Body (use {{name}} {{org}} {{position}} {{replyBy}}; blank line = new paragraph)</label><textarea id="body" rows="14"></textarea>
-<div class="bar"><button class="sec" id="save">Save as my template</button><button class="sec" id="reset">Reset to default</button></div>
+<div class="lang-row"><span class="lbl" id="layLbl">Letter language</span><div class="seg" id="laySeg" role="group" aria-labelledby="layLbl"><button type="button" data-v="en" aria-pressed="true">English</button><button type="button" data-v="th" aria-pressed="false">ไทย</button><button type="button" data-v="both" aria-pressed="false">Both</button></div>
+<select id="lay" hidden aria-hidden="true" tabindex="-1"><option value="en">English</option><option value="th">ไทย (Thai)</option><option value="both">Both (English + Thai)</option></select></div>
+</section>
+<section class="card" id="secRcpt" aria-labelledby="rcptH">
+<h2 id="rcptH"><span class="n">1</span>Recipient</h2>
+<label for="addresseeMode">Addressing style</label><select id="addresseeMode"><option value="named">Named recipient</option><option value="generic">To Whom It May Concern</option><option value="team">Team / Department</option></select>
+<div id="namedFields">
+<div class="name-row"><div><label for="sal">Title</label><select id="sal"><option>Mr.</option><option>Ms.</option><option>Mrs.</option><option>Dr.</option><option>Prof.</option><option>Assoc. Prof.</option><option>Khun</option><option>คุณ</option><option>ดร.</option><option>ศ.</option><option>รศ.</option><option>ผศ.</option><option>ท่าน</option><option></option></select></div>
+<div data-l="en"><label for="nameEn">Full name (English)</label><input id="nameEn" placeholder="e.g. Somchai Wongsakul" autocomplete="off" required></div>
+<div data-l="th"><label for="nameTh">Full name (Thai)</label><input id="nameTh" class="th" placeholder="เช่น สมชาย วงศ์สกุล" autocomplete="off" required></div></div>
+</div>
+<div class="two">
+<div data-l="en"><label id="posL" for="positionEn">Position (English)</label><input id="positionEn" placeholder="e.g. Director of ..."></div>
+<div data-l="en"><label id="orgL" for="orgEn">Organisation / School (English)</label><input id="orgEn" placeholder="Organisation" required></div>
+<div data-l="th"><label for="positionTh">Position (Thai)</label><input id="positionTh" class="th" placeholder="ตำแหน่ง"></div>
+<div data-l="th"><label for="orgTh">Organisation / School (Thai)</label><input id="orgTh" class="th" placeholder="องค์กร / โรงเรียน" required></div>
+</div>
+<details class="more" id="addrMore"><summary><span id="addrSumT">Add address</span> <span class="opt">optional</span></summary>
+<div data-l="en"><label for="addrEn">Address (English) <span class="opt">one line per row</span></label><textarea id="addrEn" rows="2"></textarea></div>
+<div data-l="th"><label for="addrTh">Address (Thai) <span class="opt">one line per row</span></label><textarea id="addrTh" class="th" rows="2"></textarea></div>
+</details>
+</section>
+<section class="card" id="secDet" aria-labelledby="detH">
+<h2 id="detH"><span class="n">2</span>Letter details</h2>
+<label for="date">Date</label><input type="date" id="date" required>
+<details class="more" id="detMore"><summary>More options <span class="sum" id="detSum"></span></summary>
+<div class="two"><div><label for="reply">Please reply by</label><input id="reply" placeholder="e.g. 15 November 2026"></div><div><label for="enc">Enclosures</label><input id="enc"></div></div>
+<label for="ref">Reference no. <span class="opt">optional</span></label><input id="ref" placeholder="Only if officially assigned" aria-describedby="refHelp">
+<small class="help" id="refHelp">Use a reference number only if the school or supervising staff has approved/assigned one.</small>
+<label for="wmo">Watermark (strength)</label><div class="chk"><input type="checkbox" id="wm" checked aria-label="Show watermark"><input type="range" id="wmo" min="3" max="20" value="8" aria-label="Watermark strength"></div>
+</details>
+</section>
+<section class="card" id="secSig" aria-labelledby="sigH">
+<h2 id="sigH"><span class="n">3</span>Signatures</h2>
+<div class="two"><div data-l="en"><label for="s1nEn">Signatory name (English)</label><input id="s1nEn" placeholder="e.g. Nicha Srisuk"></div><div data-l="th"><label for="s1nTh">Signatory name (Thai)</label><input id="s1nTh" placeholder="เช่น ณิชา ศรีสุข"></div></div>
+<label for="s1p">Position</label><input id="s1p" placeholder="e.g. Head of Partnerships, SPIP Hack 2027">
+<label class="chk"><input type="checkbox" id="s2on"><span>Add a second signatory (e.g. supervising teacher)</span></label>
+<div id="s2box" style="display:none"><div class="two"><div data-l="en"><label for="s2nEn">Second name (English)</label><input id="s2nEn"></div><div data-l="th"><label for="s2nTh">Second name (Thai)</label><input id="s2nTh"></div></div><label for="s2p">Position</label><input id="s2p"></div>
+<label class="chk"><input type="checkbox" id="stamp"><span>Leave an area for the school stamp</span></label>
+<small class="mini">Signatory details are remembered on this device. <button type="button" class="link" id="sigClear">Forget and clear</button></small>
+</section>
+<section class="card" id="secTxt" aria-labelledby="txtH">
+<div class="sec-h"><h2 id="txtH"><span class="n">4</span>Letter text</h2><span class="badge" id="tplBadge" role="status">Using default template</span></div>
+<label for="subj">Subject</label><input id="subj">
+<label for="body">Body</label>
+<div class="chips" role="group" aria-label="Insert a placeholder at the cursor"><span class="mini">Insert:</span><button type="button" class="chip" data-v="{{name}}">{{name}}</button><button type="button" class="chip" data-v="{{org}}">{{org}}</button><button type="button" class="chip" data-v="{{position}}">{{position}}</button><button type="button" class="chip" data-v="{{replyBy}}">{{replyBy}}</button></div>
+<textarea id="body" rows="14" aria-describedby="bodyHelp"></textarea>
+<small class="help" id="bodyHelp">Leave a blank line to start a new paragraph.</small>
+<div class="bar"><button class="sec" id="save">Save as my template</button><button class="sec" id="reset">Reset to default</button><span class="mini" id="tplMsg" role="status" aria-live="polite"></span></div>
 <div class="note" id="sponNote" style="display:none">Sponsor template is not set yet. Write or paste your structure above, then press "Save as my template".</div>
+</section>
+<div class="actions">
 <div id="turnstile"></div>
-<div class="bar"><button class="act" id="driveSave">Save PDF to Google Drive</button></div>
-<div class="bar"><button class="act" id="print">Save as PDF / Print</button></div>
-<p class="sub" style="margin-top:8px">In the print window choose “Save as PDF”, paper A4, margins None, and turn off “Headers and footers”.</p>
+<div class="status" id="driveStatus" role="status" aria-live="polite" hidden></div>
+<div class="bar"><button class="act" id="driveSave">Save PDF to Google Drive</button><button class="sec2" id="print">Save as PDF / Print</button><button class="sec2 pvjump" id="pvJump" type="button">Preview ↓</button></div>
+<details class="tip"><summary>Printing? Show print settings</summary><p>In the print window choose “Save as PDF”, paper A4, margins None, and turn off “Headers and footers”.</p></details>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
 <div id="pv"></div>
 <script>
@@ -217,7 +328,7 @@ g.appendChild(rw);if($('stamp').checked)g.appendChild(el('div','stamp',t.stamp))
 paginate(B,th?'th':'en','SPIP Hack 2027 · '+(th?VENUE_TH:VENUE_EN)+' · hackathon@spip.in.th')}
 Object.keys(P).forEach(k=>{const b=el('button','party');b.dataset.k=k;b.innerHTML=P[k].n+'<small>'+P[k].d+'</small>';b.onclick=()=>pick(k);$('parties').appendChild(b)});
 ['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s2nEn','s2nTh','s2p','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode'].forEach(i=>$(i).addEventListener(i==='addresseeMode'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')$('namedFields').style.display=$('addresseeMode').value==='named'?'block':'none';draw()}));
-$('save').onclick=()=>{try{localStorage.setItem(tplKey(),JSON.stringify({subject:$('subj').value,body:$('body').value}));custom=true;alert('Template saved for '+P[party].n)}catch(e){alert('Could not save in this browser.')}};
+$('save').onclick=()=>{try{localStorage.setItem(tplKey(),JSON.stringify({subject:$('subj').value,body:$('body').value}));custom=true;tplNote('Template saved for '+P[party].n+' ✓')}catch(e){tplNote('Could not save in this browser.',true)}};
 $('reset').onclick=()=>{try{localStorage.removeItem(tplKey())}catch(e){}custom=false;load();draw()};
 let pdfLibrariesPromise;
 function loadPdfLibraries(){
@@ -250,11 +361,11 @@ function turnstileToken(){
   setTimeout(()=>{const i=tsWaiters.indexOf(w);if(i>=0){tsWaiters.splice(i,1);reject(new Error('Could not verify that you are human. Complete the check above the button, or reload the page.'))}},30000)});
 }
 $('driveSave').onclick=async()=>{
- if(!driveReady){alert('Google Drive saving is not set up yet: add the Apps Script URL and Turnstile site key in config.js.');return}
+ if(!driveReady){driveMsg('err','Google Drive saving is not set up yet: add the Apps Script URL and Turnstile site key in config.js.');return}
  const button=$('driveSave');
  const recipient=$('orgEn').value.trim()||$('orgTh').value.trim()||'general-recipient';
  const filename=('SPIP Hack - '+P[party].n+' - '+recipient).replace(/[\\/:*?"<>|#%{}~&]/g,'-');
- button.disabled=true;button.textContent='Verifying…';
+ button.disabled=true;button.textContent='Verifying…';driveMsg('busy','Saving… this takes a few seconds.');
  let sent=false;
  try{
   const token=await turnstileToken();
@@ -278,15 +389,59 @@ $('driveSave').onclick=async()=>{
   catch(e){throw new Error('Could not reach the save service. Check the Apps Script URL in config.js and that the deployment allows "Anyone".')}
   let file;try{file=await res.json()}catch(e){throw new Error('Unexpected reply from the save service (HTTP '+res.status+').')}
   if(!file.ok)throw new Error(file.error||'Unknown error.');
-  alert('PDF saved to Google Drive: '+file.name+'\n'+file.url);
- }catch(error){alert('Could not save PDF to Google Drive: '+(error.message||error))}
+  driveMsg('ok','Saved to Drive ✓ '+file.name,file.url);
+ }catch(error){driveMsg('err','Could not save PDF to Google Drive: '+(error.message||error),null,true)}
  finally{
   // Each Turnstile token works once, so get a fresh one for the next save.
   if(sent&&tsWidget!=null)try{turnstile.reset(tsWidget)}catch(e){}
   button.disabled=false;button.textContent='Save PDF to Google Drive'}
 };
 $('print').onclick=async()=>{if(document.fonts?.ready)await document.fonts.ready;draw();document.title='SPIP Hack Letter - '+P[party].n+' - '+($('orgEn').value||$('orgTh').value||'general-recipient');window.print()};
+// ---- Interface helpers. They only change the form; the letter, PDF and print output are untouched. ----
+$('hdLogo').src=LOGO;
+const UI=$('ui'),segBtns=[...document.querySelectorAll('#laySeg button')];let edited=false,booted=false;
+function syncLang(){const v=lang();UI.dataset.lang=v;segBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==v))}
+segBtns.forEach(b=>b.onclick=()=>{if(lang()==b.dataset.v)return;$('lay').value=b.dataset.v;$('lay').dispatchEvent(new Event('input'));syncLang();detSum()});
+function hasSaved(){try{return !!localStorage.getItem(tplKey())}catch(e){return false}}
+function updBadge(){const b=$('tplBadge'),s=hasSaved();b.textContent=s?(edited?'Your template · edited':'Using your template'):(edited?'Edited · not saved':'Using default template');b.className='badge'+(s&&!edited?' mine':edited?' edit':'')}
+const baseLoad=load;load=function(){baseLoad();edited=false;updBadge()};
+const basePick=pick;pick=function(k){const changed=k!==party;basePick(k);document.querySelectorAll('.party').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k==k));detSum();if(booted&&changed)toast(P[k].n+' template loaded'+(hasSaved()?' (your saved version)':''))};
+['body','subj'].forEach(i=>$(i).addEventListener('input',()=>{edited=true;updBadge();if(i=='body')detSum()}));
+let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+let tplT;function tplNote(m,err){const n=$('tplMsg');n.textContent=m;n.className='mini'+(err?' err':'');clearTimeout(tplT);tplT=setTimeout(()=>n.textContent='',4000)}
+const doSave=$('save').onclick;$('save').onclick=()=>{doSave();if(hasSaved())edited=false;updBadge()};
+// Reset asks for a second click so a template is never lost by accident.
+const doReset=$('reset').onclick;let armT=0;
+function disarm(){clearTimeout(armT);armT=0;$('reset').textContent='Reset to default';$('reset').classList.remove('warn')}
+$('reset').onclick=()=>{if(!armT){$('reset').textContent='Click again to reset';$('reset').classList.add('warn');armT=setTimeout(disarm,4000);return}disarm();doReset();tplNote('Back to the default template')};
+function driveMsg(kind,msg,url,retry){const s=$('driveStatus');s.hidden=false;s.className='status '+kind;s.textContent=msg;
+if(url&&/^https:\/\//.test(url)){const a=el('a',null,'Open in Drive');a.href=url;a.target='_blank';a.rel='noopener';s.append(' · ',a)}
+if(retry){const b=el('button','link','Retry');b.type='button';b.onclick=()=>$('driveSave').click();s.append(' ',b)}}
+document.querySelectorAll('.chip').forEach(c=>{c.onmousedown=e=>e.preventDefault();c.onclick=()=>{const t=$('body'),v=c.dataset.v;t.focus();
+if(!document.execCommand('insertText',false,v)){const a=t.selectionStart,b=t.selectionEnd;t.setRangeText(v,a,b,'end');t.dispatchEvent(new Event('input'))}}});
+function detSum(){const y=$('reply').value.trim(),e=$('enc').value.trim(),r=$('ref').value.trim(),out=[];
+const needY=!y&&$('body').value.includes('{{replyBy}}');
+out.push(needY?'<span class="warn">Reply-by date not set</span>':y?'Reply by '+esc(y):'No reply-by date');
+out.push(e?'Enclosures: '+esc(e):'No enclosures');if(r)out.push('Ref '+esc(r));out.push($('wm').checked?'Watermark on':'No watermark');
+$('detSum').innerHTML=out.join(' · ');
+$('addrSumT').textContent=($('addrEn').value.trim()||$('addrTh').value.trim())?'Address added':'Add address'}
+function esc(x){return x.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+['reply','enc','ref','wm','addrEn','addrTh'].forEach(i=>$(i).addEventListener('input',detSum));
+// Remember the signatory on this device.
+const SIG=['s1nEn','s1nTh','s1p','s2on','s2nEn','s2nTh','s2p'],SIGK='letter_signatory';
+try{const m=JSON.parse(localStorage.getItem(SIGK)||'null');if(m){SIG.forEach(i=>{if(m[i]==null)return;if($(i).type=='checkbox')$(i).checked=!!m[i];else $(i).value=m[i]});$('s2box').style.display=$('s2on').checked?'block':'none'}}catch(e){}
+function saveSig(){try{const m={};SIG.forEach(i=>m[i]=$(i).type=='checkbox'?$(i).checked:$(i).value);localStorage.setItem(SIGK,JSON.stringify(m))}catch(e){}}
+SIG.forEach(i=>$(i).addEventListener('input',saveSig));
+$('sigClear').onclick=()=>{try{localStorage.removeItem(SIGK)}catch(e){}SIG.forEach(i=>{if($(i).type=='checkbox')$(i).checked=false;else $(i).value=''});$('s2box').style.display='none';draw();toast('Saved signatory forgotten')};
+// Step indicator: scroll to a section, and highlight the one in view.
+const steps=[...document.querySelectorAll('.steps a')],seen={};
+steps.forEach(a=>a.onclick=e=>{e.preventDefault();$(a.dataset.s).scrollIntoView({behavior:'smooth',block:'start'})});
+function markStep(i){steps.forEach((a,j)=>{a.classList.toggle('on',j==i);if(j==i)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current')});document.querySelector('.steps').style.setProperty('--p',i<0?0:(i+1)/steps.length)}
+if(window.IntersectionObserver){const io=new IntersectionObserver(es=>{es.forEach(e=>seen[e.target.id]=e.isIntersecting);const i=steps.findIndex(a=>seen[a.dataset.s]);if(i>=0||seen.secStart)markStep(i)},{rootMargin:'-90px 0px -50% 0px'});
+['secStart',...steps.map(a=>a.dataset.s)].forEach(id=>io.observe($(id)))}
+$('pvJump').onclick=()=>$('pv').scrollIntoView({behavior:'smooth',block:'start'});
 $('date').value=new Date().toISOString().slice(0,10);$('namedFields').style.display='block';pick('schools');
+booted=true;syncLang();updBadge();detSum();
 // Web fonts (e.g. Sarabun for Thai) change line widths, so lay out the pages again when they finish loading.
 document.fonts?.addEventListener?.('loadingdone',()=>draw());
 </script></body></html>
