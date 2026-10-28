@@ -6,6 +6,18 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
 <script src="config.js"></script>
 <style>
+/* Rich-text Body editor, styled to match the other inputs */
+.editor{overflow:hidden;border:1px solid var(--line-strong);border-radius:10px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.editor:hover{border-color:#B9B4CB}
+.editor:focus-within{border-color:var(--purple);box-shadow:0 0 0 3px rgba(46,230,200,.35)}
+.editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;padding:6px;border-bottom:1px solid var(--line);background:var(--bg)}
+.editor-toolbar button{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:500 13px/1 var(--font-body);cursor:pointer}
+.editor-toolbar button:hover{background:var(--line)}
+.editor-toolbar button:focus-visible{outline:2px solid var(--purple);outline-offset:1px}
+.tb-group{display:inline-flex;gap:2px;padding-right:6px;margin-right:4px;border-right:1px solid var(--line-strong)}
+.document-editor{min-height:320px;padding:12px 14px;color:var(--ink);background:#fff;font:14px/1.6 var(--font-body);text-align:left;overflow-wrap:anywhere;outline:none}
+.document-editor p{margin:0 0 10px}
+.document-editor ul,.document-editor ol{margin:0 0 10px;padding-left:22px}
 *{box-sizing:border-box}
 /* Brand tokens from SpipHack27_LandingPage css/style.css :root, inverted for a light page */
 :root{--purple:#4B3F78;--magenta:#C4449A;--orange:#F2622A;--red:#E8141C;--cyan:#2EE6C8;--teal:#16968A;--on-cyan:#04211D;
@@ -38,7 +50,7 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink)
 #ui h2 .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--grad-brand);color:#fff;font:600 12px var(--font-body)}
 #roles h2{font:500 13px var(--font-body)!important;color:var(--muted)!important;margin:16px 0 2px!important}
 .parties{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.party{position:relative;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:14px 34px 14px 14px;text-align:left;font:600 14px/1.3 var(--font-body);color:var(--ink);cursor:pointer;min-height:72px;transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s}
+.party{position:relative;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:14px 32px 14px 14px;text-align:left;font:600 14px/1.3 var(--font-body);color:var(--ink);cursor:pointer;min-height:72px;transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s}
 .party small{display:block;font-weight:400;color:var(--muted);margin-top:4px;font-size:12px}
 .party:hover{transform:translateY(-1px);border-color:var(--line-strong);box-shadow:0 10px 22px -14px rgba(196,68,154,.5)}
 .party.on{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad-brand) border-box;box-shadow:0 12px 26px -16px rgba(196,68,154,.65)}
@@ -52,6 +64,9 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink)
 #ui label{display:block;font-size:13px;font-weight:500;color:#3A3550;margin:12px 0 5px}
 #ui label .opt,.more summary .opt{font-weight:400;color:var(--muted);font-size:12px}
 #ui input,#ui select,#ui textarea{width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;font:14px/1.5 var(--font-body);color:var(--ink);background:#fff;transition:border-color .15s,box-shadow .15s}
+/* Same height and inner padding for every single-line field */
+#ui input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]),#ui select{height:44px;padding:0 12px;line-height:1.5}
+#ui select{-webkit-appearance:none;appearance:none;padding-right:36px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236B6784' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;cursor:pointer}
 #ui input:hover,#ui select:hover,#ui textarea:hover{border-color:#B9B4CB}
 #ui input:focus,#ui select:focus,#ui textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(46,230,200,.35);outline:none}
 #ui input:user-invalid{border-color:var(--orange)}
@@ -65,11 +80,11 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink)
 .help,.mini{display:block;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
 .more{margin-top:14px;border:1px dashed var(--line-strong);border-radius:var(--r-sm);padding:0 14px}
 .more[open]{border-style:solid;border-color:var(--line);background:#FCFBFE;padding-bottom:12px}
-.more summary{cursor:pointer;list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-height:44px;font-weight:600;font-size:13.5px;color:var(--purple)}
+.more summary{cursor:pointer;list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-height:44px;padding:12px 0;font-weight:600;font-size:13.5px;color:var(--purple)}
 .more summary::-webkit-details-marker{display:none}
-.more summary::before{content:"+";width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#F1EFF7;font-weight:600}
+.more summary::before{content:"+";flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#F1EFF7;font-weight:600}
 .more[open] summary::before{content:"–"}
-.more .sum{flex-basis:100%;font-weight:400;font-size:12px;color:var(--muted);margin:-6px 0 8px 28px}
+.more .sum{flex-basis:100%;font-weight:400;font-size:12px;line-height:1.5;color:var(--muted);margin:0 0 0 28px}
 .more[open] .sum{display:none}.more .sum .warn{color:#A3360F;font-weight:500}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:500;background:#F1EFF7;color:var(--muted);border:1px solid var(--line)}
 .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#B9B4CB}
@@ -102,8 +117,8 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 #pv::before{content:"Live preview · matches the PDF";display:block;text-align:center;font:500 12px var(--font-body);letter-spacing:.04em;color:var(--muted);margin:-14px 0 12px}
 @media (prefers-reduced-motion:reduce){#ui *{transition:none!important}}
 #pv{overflow:auto;padding:28px 24px;background:#F1F0F6;min-width:0}
-.sheet{width:210mm;height:297mm;overflow:hidden;margin:0 auto;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.18);padding:16mm 23mm 17mm;display:flex;flex-direction:column;font-size:11.5pt;line-height:1.58;color:#000}
-.sheet .logo{text-align:center}.sheet .logo img{width:112mm;max-width:100%;height:auto;display:block;margin:0 auto}
+.sheet{width:210mm;height:297mm;overflow:hidden;margin:0 auto;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.18);padding:10mm 23mm 17mm;display:flex;flex-direction:column;font-size:11.5pt;line-height:1.58;color:#000}
+.sheet .logo{margin:0 0 2mm;text-align:center;line-height:0}.sheet .logo img{width:85mm;max-width:100%;height:auto;display:block;margin:0 auto}
 .meta{display:flex;justify-content:space-between;margin-top:8mm;font-size:10.5pt}
 .rcpt{margin-top:7mm;white-space:pre-line}.subj{margin:7mm 0 4mm;font-weight:700;line-height:1.45}.body{overflow-wrap:anywhere}.body p{margin:0 0 4mm;text-align:left}
 .body p{margin:0 0 3.2mm;text-align:justify}.enc{font-size:10.5pt;margin-top:3mm}
@@ -117,7 +132,7 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 .body ul{margin:0 0 3.2mm;padding-left:7mm}.body li{margin-bottom:1mm}
 .en{font-family:Arial,Helvetica,sans-serif;font-size:11.5pt;line-height:1.58}
 .th{font-family:'TH Sarabun New',Sarabun,Thonburi,Tahoma,'Noto Sans Thai',sans-serif;font-size:12pt;line-height:1.55}
-.sheet+.sheet{margin-top:24px}
+.sheet+.sheet{margin-top:24px}.sheet+.sheet{padding-top:18mm}
 
 @media screen and (max-width:1050px){body{grid-template-columns:400px minmax(0,1fr)}#pv{padding:16px}.sheet{transform-origin:top center}}
 @media screen and (max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh}#ui{width:100%;max-height:none;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}#pv{overflow:auto;padding:12px}.sheet{margin:0;width:210mm;height:297mm}:root{--gx:16px}html{scroll-padding-top:70px}.pvjump{display:inline-block}#pv::before{margin:0 0 10px;text-align:left}.toast{bottom:170px;right:var(--gx)}}
@@ -185,7 +200,35 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 <label for="subj">Subject</label><input id="subj">
 <label for="body">Body</label>
 <div class="chips" role="group" aria-label="Insert a placeholder at the cursor"><span class="mini">Insert:</span><button type="button" class="chip" data-v="{{name}}">{{name}}</button><button type="button" class="chip" data-v="{{org}}">{{org}}</button><button type="button" class="chip" data-v="{{position}}">{{position}}</button><button type="button" class="chip" data-v="{{replyBy}}">{{replyBy}}</button></div>
-<textarea id="body" rows="14" aria-describedby="bodyHelp"></textarea>
+<div class="editor">
+  <div class="editor-toolbar" role="toolbar" aria-label="Text formatting">
+    <span class="tb-group">
+      <button type="button" data-command="bold" title="Bold" aria-label="Bold"><strong>B</strong></button>
+      <button type="button" data-command="italic" title="Italic" aria-label="Italic"><em>I</em></button>
+      <button type="button" data-command="underline" title="Underline" aria-label="Underline"><u>U</u></button>
+    </span>
+    <span class="tb-group">
+      <button type="button" data-command="insertUnorderedList" title="Bulleted list">• List</button>
+      <button type="button" data-command="insertOrderedList" title="Numbered list">1. List</button>
+    </span>
+    <span class="tb-group">
+      <button type="button" data-command="justifyLeft" title="Align left">Left</button>
+      <button type="button" data-command="justifyCenter" title="Center">Center</button>
+      <button type="button" data-command="justifyRight" title="Align right">Right</button>
+    </span>
+    <button type="button" id="clearFormatting" title="Clear formatting">Clear</button>
+  </div>
+
+  <div
+    id="body"
+    class="document-editor"
+    contenteditable="true"
+    role="textbox"
+    aria-label="Letter body"
+    aria-multiline="true"
+    spellcheck="true"
+  ></div>
+</div>
 <small class="help" id="bodyHelp">Leave a blank line to start a new paragraph.</small>
 <div class="bar"><button class="sec" id="save">Save as my template</button><button class="sec" id="reset">Reset to default</button><span class="mini" id="tplMsg" role="status" aria-live="polite"></span></div>
 <div class="note" id="sponNote" style="display:none">Sponsor template is not set yet. Write or paste your structure above, then press "Save as my template".</div>
@@ -241,23 +284,101 @@ let b='On behalf of the SPIP Hack 2027 Organizing Committee, we would like to in
 if(R.judge)b+='\n\nHackathon Judge (Day 2, 7 March 2027): Each finalist team gives a 5-minute presentation followed by 5 minutes of Q&A. Judges score independently using a standardised rubric and disclose any conflict of interest. Scoring materials are provided on the day. The judging day runs approximately from 08:00 to 16:00, including lunch (provisional).';
 if(R.keynote)b+='\n\nKeynote Speaker (Day 1, 6 March 2027): A session of about 45 minutes in English for the student audience, on a theme shaped around your own expertise, such as innovation, problem-solving or your career journey. We would be grateful to receive your presentation file in advance. We provide a screen, laptop, presenter clicker and microphones.';
 b+='\n\nRefreshments will be provided, and a certificate of appreciation will be issued where applicable. We would be most grateful if you could let us know by {{replyBy}} whether you are available and interested. We would be delighted to have you join us.';o.body=b;}}
-else{if(th){o.subject='ขอความอนุเคราะห์สนับสนุนการจัดงาน SPIP Hack 2027 “City of Tomorrow”';o.body='ด้วยคณะผู้จัดงาน SPIP Hack 2027 ภายใต้หัวข้อ “City of Tomorrow” ซึ่งเป็นการแข่งขันนวัตกรรมที่นักเรียนเป็นผู้จัดขึ้นและเปิดโอกาสให้นักเรียนมัธยมศึกษาจากหลายโรงเรียนเข้าร่วม โดย หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร กำหนดจัดกิจกรรมในวันที่ 6–7 มีนาคม พ.ศ. 2570 (วันที่อาจมีการเปลี่ยนแปลง) มีทีมนักเรียนเข้ารอบสูงสุด 15 ทีม ทีมละ 2–4 คน\n\nกิจกรรมนี้มีวัตถุประสงค์เพื่อส่งเสริมให้นักเรียนค้นหาปัญหาจริงในเมืองและพัฒนาแนวคิดอย่างเป็นรูปธรรม เพื่อให้เมืองมีสุขภาพดี ยั่งยืน และน่าอยู่ยิ่งขึ้น ผ่านการรับคำแนะนำจากที่ปรึกษาและการนำเสนอต่อคณะกรรมการ คณะผู้จัดงานเล็งเห็นว่า {{org}} ให้ความสำคัญกับ [ระบุจุดเด่นของบริษัทที่เกี่ยวข้องกับงาน] จึงใคร่ขอความอนุเคราะห์จากท่านในการสนับสนุนดังนี้\n\n- สนับสนุนเงินรางวัลหรือทุนในการจัดงาน (จำนวน ______ บาท)\n- สนับสนุนอาหาร เครื่องดื่ม หรือผลิตภัณฑ์ (รายการและจำนวน ______)\n- สนับสนุนวิทยากร ที่ปรึกษา อุปกรณ์ หรือเทคโนโลยี\n- (หรือการสนับสนุนในรูปแบบอื่น ตามที่ท่านเห็นสมควร)\n\nผู้สนับสนุนจะได้รับการเผยแพร่โลโก้บนสื่อของงาน การกล่าวขอบคุณในพิธีเปิดหรือพิธีมอบรางวัล และการกล่าวถึงในช่องทางโซเชียลมีเดียของงาน (@spip.hack) ทั้งนี้ ผู้สนับสนุนไม่มีส่วนเกี่ยวข้องกับการตัดสินผลการแข่งขัน และกิจกรรมที่เกี่ยวข้องกับนักเรียนอยู่ภายใต้การอนุมัติของโรงเรียน\n\nคณะผู้จัดงานหวังเป็นอย่างยิ่งว่าจะได้รับความอนุเคราะห์จากท่าน และขอขอบพระคุณล่วงหน้า ณ โอกาสนี้ หากท่านมีข้อสงสัยหรือต้องการข้อมูลเพิ่มเติม สามารถติดต่อได้ที่อีเมล hackathon@spip.in.th ภายในวันที่ {{replyBy}}';}
-else{o.subject='Partnership invitation: SPIP Hack 2027 “City of Tomorrow”';o.body='I am writing on behalf of the SPIP Hack 2027 Organizing Committee to explore whether {{org}} might be interested in supporting SPIP Hack 2027, a student-led, cross-school innovation competition for secondary students. The event is planned for 6–7 March 2027 at Satit Prasarnmit International Programme (SPIP) in Bangkok, with up to 15 finalist teams of two to four students.\n\nUnder the theme “City of Tomorrow”, students will work in teams to develop practical ideas that could make cities healthier, more sustainable and better places to live. We see a potential connection between the event and {{org}}’s work in [relevant area], and would welcome the opportunity to discuss a partnership that fits your organisation’s interests.\n\nSupport could take several forms, depending on what would be most useful to your organisation and our participants—for example, event funding or prizes; food, drinks or products; a relevant challenge or award; or access to technology, equipment, workshops or mentors. We would be happy to share the sponsorship proposal and discuss a suitable option with your team.\n\nPartners may be acknowledged on event materials and our social media (@spip.hack), with recognition at the event where appropriate. To protect the integrity of the competition, partners will not influence judging or results, and all activities involving students are subject to school approval. Dates and arrangements remain provisional pending confirmation.\n\nIf this is of interest, we would be glad to provide further details or arrange a brief conversation. Thank you for considering the invitation. You can reach us at hackathon@spip.in.th.';}}
+else if(party=='sponsors'){
+if(th){
+o.subject='ขอเชิญร่วมเป็นพันธมิตรสนับสนุน SPIP Hack 2027 “City of Tomorrow”';
+o.body=`<p>ในนามของคณะผู้จัดงาน SPIP Hack 2027 ทางเรามีความยินดีขอเรียนเชิญ {{org}} พิจารณาความเป็นไปได้ในการร่วมเป็นพันธมิตรสนับสนุน SPIP Hack 2027 ซึ่งเป็นการแข่งขันนวัตกรรมข้ามโรงเรียนที่นักเรียนเป็นผู้จัด สำหรับนักเรียนระดับมัธยมศึกษา ภายใต้หัวข้อ “City of Tomorrow”</p>
+<p>กิจกรรมมีกำหนดจัดขึ้นเบื้องต้นในวันที่ 6–7 มีนาคม พ.ศ. 2570 ณ ${VENUE_TH} โดยจะมีทีมที่ผ่านเข้ารอบสุดท้ายไม่เกิน 15 ทีม แต่ละทีมประกอบด้วยนักเรียน 2–4 คน</p>
+<p>การแข่งขันส่งเสริมให้นักเรียนค้นหาความท้าทายในเมืองจากสถานการณ์จริง และพัฒนาแนวทางแก้ไขที่นำไปใช้ได้จริง เพื่อให้เมืองมีสุขภาพดี ยั่งยืน และน่าอยู่ยิ่งขึ้น ผ่านการรับคำแนะนำจากที่ปรึกษาและการนำเสนอผลงานต่อคณะกรรมการตัดสิน ผู้เข้าร่วมจะได้พัฒนาแนวคิดให้เป็นนวัตกรรมที่มีความหมาย</p>
+<p>ด้วยความเชี่ยวชาญของ {{org}} ในด้านที่เกี่ยวข้องกับสุขภาพ โภชนาการ และความเป็นอยู่ที่ดีของผู้บริโภค เราเชื่อว่าเป้าหมายขององค์กรอาจสอดคล้องกับวัตถุประสงค์ของกิจกรรม และใคร่ขอความอนุเคราะห์ในการสนับสนุนในรูปแบบหนึ่งหรือหลายรูปแบบ ดังต่อไปนี้</p>
+<ul>
+<li><strong>งบประมาณสนับสนุนกิจกรรม:</strong> ประมาณ 20,000–30,000 บาท เพื่อสนับสนุนการดำเนินงานและกิจกรรมต่าง ๆ ของงาน</li>
+<li><strong>อาหารว่างและเครื่องดื่ม:</strong> อาหารว่างแบบบรรจุแยกประมาณ 300–400 ชุด และ/หรือเครื่องดื่มประมาณ 300–400 หน่วย สำหรับจุดบริการตนเองของผู้เข้าร่วมและเจ้าหน้าที่ โดยสามารถปรับจำนวนและประเภทผลิตภัณฑ์ตามความพร้อมขององค์กรได้</li>
+<li><strong>ความเชี่ยวชาญและทรัพยากร:</strong> วิทยากร ที่ปรึกษา อุปกรณ์ เทคโนโลยี หรือการสนับสนุนรูปแบบอื่นที่เกี่ยวข้องกับการแข่งขัน</li>
+</ul>
+<p>เพื่อเป็นการขอบคุณสำหรับการสนับสนุน พันธมิตรอาจได้รับการแสดงโลโก้บนสื่อประชาสัมพันธ์ การกล่าวขอบคุณในพิธีเปิดหรือพิธีมอบรางวัล และการเผยแพร่ผ่านช่องทางโซเชียลมีเดียของงาน (@spip.hack) ทั้งนี้ ผู้สนับสนุนจะไม่มีส่วนในการกำหนดผลการตัดสินหรือแทรกแซงการแข่งขัน และกิจกรรมทั้งหมดที่เกี่ยวข้องกับนักเรียนจะต้องได้รับการอนุมัติจากโรงเรียน</p>
+<p>คณะผู้จัดงานยินดีแบ่งปันข้อเสนอการสนับสนุนและหารือเกี่ยวกับความร่วมมือที่เหมาะสมกับความสนใจและศักยภาพขององค์กร ขอขอบพระคุณที่พิจารณาคำเชิญนี้ หากต้องการข้อมูลเพิ่มเติม กรุณาติดต่อ hackathon@spip.in.th ภายในวันที่ 20 พฤศจิกายน พ.ศ. 2569</p>`;
+}else{
+o.subject='Partnership invitation: SPIP Hack 2027 “City of Tomorrow”';
+o.body=`<p>On behalf of the SPIP Hack 2027 Organizing Committee, we are pleased to invite {{org}} to explore a potential partnership with SPIP Hack 2027, a student-led, cross-school innovation competition for secondary students under the theme “City of Tomorrow.”</p>
+<p>The event is provisionally scheduled for March 6–7, 2027, at ${VENUE_EN}, Bangkok, Thailand, and will bring together up to 15 finalist teams, each comprising 2–4 students.</p>
+<p>The competition encourages students to identify real-world urban challenges and develop practical solutions to make cities healthier, more sustainable, and better places to live. Through mentorship and final presentations to a judging panel, participants will have the opportunity to develop their ideas into meaningful innovations.</p>
+<p>Given {{org}}’s work in health, nutrition, and consumer well-being, we believe there may be a potential alignment with the goals of our event. We would be grateful for your consideration of support in one or more of the following forms:</p>
+<ul>
+<li><strong>Event funding:</strong> Approximately THB 20,000–30,000 to support event operations and activities.</li>
+<li><strong>Snacks and beverages:</strong> Approximately 300–400 individual snack packs and/or 300–400 individual beverage units for a self-service refreshment station for participants and event staff. Quantities and product selection are flexible and can be discussed based on your availability.</li>
+<li><strong>Expertise and resources:</strong> Speakers, mentors, equipment, technology, or other forms of support relevant to the competition.</li>
+</ul>
+<p>In recognition of your support, partners may receive logo placement on event materials, acknowledgement at the opening or awards ceremony, and recognition through our social media channels (@spip.hack). To ensure a fair competition, sponsors will have no influence over judging or results. All activities involving students are subject to school approval.</p>
+<p>We would welcome the opportunity to share our sponsorship proposal and discuss a partnership that aligns with your organization’s interests and capacity. Thank you for considering our invitation.</p>
+<p>Should you require further information, please contact us at hackathon@spip.in.th by November 20, 2026.</p>`;
+}
+}
 o.body=o.body.replaceAll('โดย หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร กำหนดจัดกิจกรรมในวันที่','โดยจัดกิจกรรมในวันที่').replaceAll('Satit Prasarnmit International Programme of Srinakharinwirot University Prasarnmit Demonstration School (Secondary) (SPIP), Bangkok',ORGANIZER_EN).replaceAll('หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร',ORGANIZER_TH).replaceAll('ด้วย '+ORGANIZER_TH,'ด้วย'+ORGANIZER_TH).replaceAll('โดย '+ORGANIZER_TH,'โดย'+ORGANIZER_TH).replaceAll('คณะผู้จัดงานขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027',ORGANIZER_TH+' ขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027').replaceAll('We are writing to invite you to support SPIP Hack 2027','On behalf of '+ORGANIZER_EN+', we are writing to invite you to support SPIP Hack 2027').replaceAll('Satit Prasarnmit International Programme (SPIP), Bangkok',VENUE_EN).replaceAll('โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (SPIP) กรุงเทพมหานคร',VENUE_TH);
 o.body=o.body.replaceAll('ณ '+VENUE_TH+' กรุงเทพมหานคร ในวันที่','ในวันที่').replaceAll('ณ '+VENUE_TH+' ในวันที่','ในวันที่').replaceAll('held at '+VENUE_EN+', ','').replaceAll('at '+VENUE_EN+', ','');
 o.body+='\n\n'+(th?'สถานที่จัดงานคือ'+VENUE_TH:'The event will be held at '+VENUE_EN+'.');
 return o;}
 function localized(enId,thId,language=lang()){return $(language=='th'?thId:enId).value}
 function fill(t,language=lang()){return t.replace(/\{\{(\w+)\}\}/g,(m,k)=>({name:$('sal').value+' '+localized('nameEn','nameTh',language),org:localized('orgEn','orgTh',language),position:localized('positionEn','positionTh',language),replyBy:$('reply').value}[k]||'[ '+k+' ]').trim());}
+function editorHTML(value){
+  const v=String(value??'');
+  if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|br|span|h[1-6])\b/i.test(v))return v;
+  return v.split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')||'<p><br></p>';
+}
 function load(){const o=gen(lang()=='both'?'en':lang()),s=localStorage.getItem(tplKey());try{if(s){const t=JSON.parse(s);o.subject=t.subject;o.body=t.body;custom=true}else custom=false}catch(e){custom=false}
-$('subj').value=o.subject;$('body').value=o.body}
+$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body)}
 function rolesUI(){const r=roles[party]||[];$('roles').innerHTML=r.length?'<h2 style="margin-top:14px">Roles offered</h2>':'';
-r.forEach(([k,l])=>{const d=document.createElement('div');d.className='chk';d.innerHTML='<input type="checkbox" '+(R[k]?'checked':'')+'><span>'+l+'</span>';d.firstChild.onchange=e=>{R[k]=e.target.checked;if(!custom){const o=gen();$('subj').value=o.subject;$('body').value=o.body}draw()};$('roles').appendChild(d)})}
+r.forEach(([k,l])=>{const d=document.createElement('div');d.className='chk';d.innerHTML='<input type="checkbox" '+(R[k]?'checked':'')+'><span>'+l+'</span>';d.firstChild.onchange=e=>{R[k]=e.target.checked;if(!custom){const o=gen();$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body)}draw()};$('roles').appendChild(d)})}
 function pick(k){party=k;document.querySelectorAll('.party').forEach(b=>b.classList.toggle('on',b.dataset.k==k));$('positionEn').placeholder=P[k].pos;$('orgEn').placeholder=P[k].org;setEnc();
 $('sponNote').style.display='none';load();rolesUI();draw()}
 function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function thDate(v){const f=new Intl.DateTimeFormat('th-TH-u-ca-buddhist',{day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(v+'T00:00')),g=t=>(f.find(p=>p.type==t)||{}).value;return g('day')+' '+g('month')+' พ.ศ. '+g('year')}
-function paras(t,language){return fill(t,language).split(/\n\s*\n/).map(p=>{const w=el('div','body'),L=p.split('\n');if(L.every(x=>/^\s*[-•]\s/.test(x))){const u=el('ul');L.forEach(x=>u.appendChild(el('li',null,x.replace(/^\s*[-•]\s/,''))));w.appendChild(u)}else w.appendChild(el('p',null,p));return w})}
+function paras(t,language){
+  const raw=String(t??'');
+  if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|br|span|h[1-6])\b/i.test(raw)){
+    const tpl=document.createElement('template');
+    tpl.innerHTML=raw;
+    const walker=document.createTreeWalker(tpl.content,NodeFilter.SHOW_TEXT);
+    let n;
+    while((n=walker.nextNode()))n.nodeValue=fill(n.nodeValue,language);
+
+    const blocks=[];
+    function collect(node){
+      [...node.childNodes].forEach(child=>{
+        if(child.nodeType!==Node.ELEMENT_NODE){
+          if(child.textContent.trim()){
+            const w=el('div','body');
+            w.appendChild(el('p',null,child.textContent));
+            blocks.push(w);
+          }
+          return;
+        }
+        if(['P','UL','OL','H1','H2','H3','H4','H5','H6'].includes(child.tagName)){
+          const w=el('div','body');
+          w.appendChild(child.cloneNode(true));
+          blocks.push(w);
+        }else if(child.tagName==='DIV'){
+          collect(child);
+        }else{
+          const w=el('div','body');
+          w.appendChild(child.cloneNode(true));
+          blocks.push(w);
+        }
+      });
+    }
+    collect(tpl.content);
+    return blocks.length?blocks:[para('')];
+  }
+  return fill(raw,language).split(/\n\s*\n/).map(p=>{
+    const w=el('div','body'),L=p.split('\n');
+    if(L.every(x=>/^\s*[-•]\s/.test(x))){
+      const u=el('ul');
+      L.forEach(x=>u.appendChild(el('li',null,x.replace(/^\s*[-•]\s/,''))));
+      w.appendChild(u);
+    }else w.appendChild(el('p',null,p));
+    return w;
+  });
+}
 // Pages: every .sheet is exactly one A4 page with its own watermark and footer. Letter blocks
 // flow into a page until it is full, then continue on a new one. Long paragraphs are split by line.
 function newPage(cls,foot,cont){const s=el('div','sheet '+cls);
@@ -303,8 +424,8 @@ const logoProbe=new Image();logoProbe.onload=()=>draw();logoProbe.src=LOGO;
 const T={en:{ref:'Ref: ',subj:'Subject: ',dear:'Dear ',dearEnd:',',close:'Sincerely,',sig:'Signature',date:'Date signed: ____________________',enc:'Enclosures: ',stamp:'School stamp',nm:'[Name]',ps:'[Position]',fb:'Partnerships Team'},
 th:{ref:'ที่ ',subj:'เรื่อง  ',dear:'เรียน  ',dearEnd:'',close:'ขอแสดงความนับถือ',sig:'ลายมือชื่อ',date:'วันที่ลงนาม: ____________________',enc:'สิ่งที่ส่งมาด้วย  ',stamp:'ตราประทับ',nm:'[ชื่อ-นามสกุล]',ps:'[ตำแหน่ง]',fb:'ท่าน'}};
 function draw(){$('pv').innerHTML='';
-if(lang()!='both'){letter(lang(),$('subj').value,$('body').value,$('enc').value,false);return}
-letter('en',$('subj').value,$('body').value,$('enc').value,true);
+if(lang()!='both'){letter(lang(),$('subj').value,$('body').innerHTML,$('enc').value,false);return}
+letter('en',$('subj').value,$('body').innerHTML,$('enc').value,true);
 const thaiText=gen('th');try{const saved=localStorage.getItem('tpl_'+party+'_th');if(saved){const template=JSON.parse(saved);thaiText.subject=template.subject;thaiText.body=template.body}}catch(e){}
 letter('th',thaiText.subject,thaiText.body,P[party].encTh,true)}
 function letter(language,subject,body,enc,bilingual){const th=language=='th',t=T[th?'th':'en'],B=[];
@@ -328,7 +449,28 @@ g.appendChild(rw);if($('stamp').checked)g.appendChild(el('div','stamp',t.stamp))
 paginate(B,th?'th':'en','SPIP Hack 2027 · '+(th?VENUE_TH:VENUE_EN)+' · hackathon@spip.in.th')}
 Object.keys(P).forEach(k=>{const b=el('button','party');b.dataset.k=k;b.innerHTML=P[k].n+'<small>'+P[k].d+'</small>';b.onclick=()=>pick(k);$('parties').appendChild(b)});
 ['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s2nEn','s2nTh','s2p','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode'].forEach(i=>$(i).addEventListener(i==='addresseeMode'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')$('namedFields').style.display=$('addresseeMode').value==='named'?'block':'none';draw()}));
-$('save').onclick=()=>{try{localStorage.setItem(tplKey(),JSON.stringify({subject:$('subj').value,body:$('body').value}));custom=true;tplNote('Template saved for '+P[party].n+' ✓')}catch(e){tplNote('Could not save in this browser.',true)}};
+// Rich-text toolbar actions
+document.querySelectorAll('.editor-toolbar [data-command]').forEach(btn=>{
+  btn.onmousedown=e=>e.preventDefault();
+  btn.onclick=()=>{
+    const editor=$('body');
+    editor.focus();
+    document.execCommand(btn.dataset.command,false,null);
+    editor.dispatchEvent(new Event('input',{bubbles:true}));
+  };
+});
+const clearButton=$('clearFormatting');
+if(clearButton){
+  clearButton.onmousedown=e=>e.preventDefault();
+  clearButton.onclick=()=>{
+    const editor=$('body');
+    editor.focus();
+    document.execCommand('removeFormat',false,null);
+    document.execCommand('formatBlock',false,'p');
+    editor.dispatchEvent(new Event('input',{bubbles:true}));
+  };
+}
+$('save').onclick=()=>{try{localStorage.setItem(tplKey(),JSON.stringify({subject:$('subj').value,body:$('body').innerHTML}));custom=true;tplNote('Template saved for '+P[party].n+' ✓')}catch(e){tplNote('Could not save in this browser.',true)}};
 $('reset').onclick=()=>{try{localStorage.removeItem(tplKey())}catch(e){}custom=false;load();draw()};
 let pdfLibrariesPromise;
 function loadPdfLibraries(){
@@ -420,7 +562,7 @@ if(retry){const b=el('button','link','Retry');b.type='button';b.onclick=()=>$('d
 document.querySelectorAll('.chip').forEach(c=>{c.onmousedown=e=>e.preventDefault();c.onclick=()=>{const t=$('body'),v=c.dataset.v;t.focus();
 if(!document.execCommand('insertText',false,v)){const a=t.selectionStart,b=t.selectionEnd;t.setRangeText(v,a,b,'end');t.dispatchEvent(new Event('input'))}}});
 function detSum(){const y=$('reply').value.trim(),e=$('enc').value.trim(),r=$('ref').value.trim(),out=[];
-const needY=!y&&$('body').value.includes('{{replyBy}}');
+const needY=!y&&$('body').innerHTML.includes('{{replyBy}}');
 out.push(needY?'<span class="warn">Reply-by date not set</span>':y?'Reply by '+esc(y):'No reply-by date');
 out.push(e?'Enclosures: '+esc(e):'No enclosures');if(r)out.push('Ref '+esc(r));out.push($('wm').checked?'Watermark on':'No watermark');
 $('detSum').innerHTML=out.join(' · ');
@@ -445,3 +587,5 @@ booted=true;syncLang();updBadge();detSum();
 // Web fonts (e.g. Sarabun for Thai) change line widths, so lay out the pages again when they finish loading.
 document.fonts?.addEventListener?.('loadingdone',()=>draw());
 </script></body></html>
+
+
