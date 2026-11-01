@@ -25,6 +25,8 @@
 --font-display:"Kanit","IBM Plex Sans Thai","Leelawadee UI","Thonburi","Sukhumvit Set","Noto Sans Thai",system-ui,sans-serif;
 --font-body:"IBM Plex Sans Thai","Leelawadee UI","Segoe UI","Thonburi","Sukhumvit Set","Noto Sans Thai",-apple-system,system-ui,sans-serif;
 --ink:#1B1630;--muted:#6B6784;--line:#E6E4EE;--line-strong:#CFCBDC;--bg:#FAFAFC;--r:24px;--r-sm:14px;--r-pill:999px;--ease:cubic-bezier(.2,.7,.2,1);--gx:24px}
+/* Stop phone browsers from enlarging text on their own: page breaks are measured from the preview. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink);display:grid;grid-template-columns:480px minmax(0,1fr);height:100vh}
 #ui{position:relative;background:var(--bg);border-right:1px solid var(--line);overflow:auto;padding:0 var(--gx);scroll-padding-top:70px;line-height:1.5;font-size:14px}
 #ui :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
@@ -384,7 +386,13 @@ function paras(t,language){
 function newPage(cls,foot,cont){const s=el('div','sheet '+cls);
 if($('wm').checked){const w=el('img','wm');w.src=LOGO;w.style.opacity=$('wmo').value/100;s.appendChild(w)}
 const c=el('div','content measuring'+(cont?' cont':''));s.appendChild(c);s.appendChild(el('div','foot',foot));$('pv').appendChild(s);return c}
-function fits(c){const l=c.lastElementChild;return !l||l.getBoundingClientRect().bottom<=c.getBoundingClientRect().bottom-2}
+// Extra room (px) kept free at the bottom of each page; raised only while exporting, when needed.
+let fitSlack=0;
+function fits(c){const l=c.lastElementChild;return !l||l.getBoundingClientRect().bottom<=c.getBoundingClientRect().bottom-2-fitSlack}
+// How far (px) the lowest line of text on a page sits below the bottom of its text area; > 0 means it is cut off.
+function overflowPx(sheet){const c=sheet.querySelector('.content');if(!c)return 0;const d=c.ownerDocument,bottom=c.getBoundingClientRect().bottom;let max=-Infinity,n;
+const w=d.createTreeWalker(c,NodeFilter.SHOW_TEXT);while((n=w.nextNode())){if(!n.nodeValue.trim())continue;const r=d.createRange();r.selectNodeContents(n);for(const q of r.getClientRects())max=Math.max(max,q.bottom)}
+return max-bottom}
 const thWords=window.Intl&&Intl.Segmenter?new Intl.Segmenter('th',{granularity:'word'}):null;
 // Places where a paragraph may be split: after spaces, and between Thai words (Thai has few spaces).
 function pieces(text){const out=[];(text.match(/\S+\s*|\s+/g)||[]).forEach(w=>{
@@ -514,15 +522,27 @@ $('driveSave').onclick=async()=>{
   button.textContent='Creating PDF…';
   await loadPdfLibraries();
   if(document.fonts?.ready)await document.fonts.ready;
-  draw();
-  const sheets=[...document.querySelectorAll('#pv .sheet')];
+  // html2canvas lays each page out again in a hidden copy, and some browsers size text slightly
+  // differently there. If any text in the copy runs past the bottom of its page, lay the pages out
+  // again with that much extra room and capture again, rather than upload a PDF with cut-off lines.
+  let canvases;
+  for(let attempt=0;;attempt++){
+   draw();
+   const sheets=[...document.querySelectorAll('#pv .sheet')];let worst=0;canvases=[];
+   for(let i=0;i<sheets.length;i++){
+    canvases.push(await window.html2canvas(sheets[i],{scale:2,backgroundColor:'#fff',useCORS:true,logging:false,windowWidth:sheets[i].scrollWidth,
+     onclone:doc=>{const copy=doc.querySelectorAll('#pv .sheet')[i];if(copy)worst=Math.max(worst,overflowPx(copy))}}));
+   }
+   if(worst<=0)break;
+   if(attempt==2)throw new Error('Part of the letter did not fit on its page in this browser. Try "Save as PDF / Print", or another browser.');
+   fitSlack+=Math.ceil(worst)+2;
+  }
   const {jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
-  for(let i=0;i<sheets.length;i++){
-   const canvas=await window.html2canvas(sheets[i],{scale:2,backgroundColor:'#fff',useCORS:true,logging:false,windowWidth:sheets[i].scrollWidth});
+  canvases.forEach((canvas,i)=>{
    // Each sheet is already exactly one A4 page, with its own watermark and footer.
    if(i)pdf.addPage('a4','portrait');
    pdf.addImage(canvas.toDataURL('image/jpeg',0.96),'JPEG',0,0,210,297,undefined,'FAST');
-  }
+  });
   const pdfDataUri=pdf.output('datauristring');
   const pdfBase64=pdfDataUri.slice(pdfDataUri.indexOf(',')+1);
   button.textContent='Saving to Google Drive…';sent=true;
@@ -536,6 +556,7 @@ $('driveSave').onclick=async()=>{
  finally{
   // Each Turnstile token works once, so get a fresh one for the next save.
   if(sent&&tsWidget!=null)try{turnstile.reset(tsWidget)}catch(e){}
+  if(fitSlack){fitSlack=0;draw()}
   button.disabled=false;button.textContent='Save PDF to Google Drive'}
 };
 $('print').onclick=async()=>{if(document.fonts?.ready)await document.fonts.ready;draw();document.title='SPIP Hack Letter - '+P[party].n+' - '+($('orgEn').value||$('orgTh').value||'general-recipient');window.print()};
