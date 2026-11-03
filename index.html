@@ -63,6 +63,7 @@ body{margin:0;font-family:var(--font-body);background:var(--bg);color:var(--ink)
 .seg button{border:0;background:none;min-height:34px;padding:6px 14px;border-radius:var(--r-pill);font:500 13px var(--font-body);color:var(--muted);cursor:pointer}
 .seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(27,22,48,.12),inset 0 -2px 0 var(--magenta)}
 #ui[data-lang="en"] [data-l="th"],#ui[data-lang="th"] [data-l="en"]{display:none}
+.edit-lang{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.edit-lang[hidden]{display:none}.edit-lang .mini{margin:0}
 #ui label{display:block;font-size:13px;font-weight:500;color:#3A3550;margin:12px 0 5px}
 #ui label .opt,.more summary .opt{font-weight:400;color:var(--muted);font-size:12px}
 #ui input,#ui select,#ui textarea{width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;font:14px/1.5 var(--font-body);color:var(--ink);background:#fff;transition:border-color .15s,box-shadow .15s}
@@ -136,7 +137,7 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 .body ul{margin:0 0 3.2mm;padding-left:7mm}.body li{margin-bottom:1mm}
 .en{font-family:Arial,Helvetica,sans-serif;font-size:11.5pt;line-height:1.58}
 .th{font-family:'TH Sarabun New',Sarabun,Thonburi,Tahoma,'Noto Sans Thai',sans-serif;font-size:12pt;line-height:1.55}
-.sheet+.sheet{margin-top:24px}.sheet+.sheet{padding-top:18mm}
+.sheet+.sheet{margin-top:24px}.sheet.cont{padding-top:18mm}
 
 @media screen and (max-width:1050px){body{grid-template-columns:400px minmax(0,1fr)}#pv{padding:16px}.sheet{transform-origin:top center}}
 @media screen and (max-width:760px){body{display:flex;flex-direction:column;height:auto;min-height:100vh}#ui{width:100%;max-height:none;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}#pv{overflow:auto;padding:12px}.sheet{margin:0;width:210mm;height:297mm}:root{--gx:16px}html{scroll-padding-top:70px}.pvjump{display:inline-block}#pv::before{margin:0 0 10px;text-align:left}.toast{bottom:170px;right:var(--gx)}}
@@ -201,6 +202,7 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 </section>
 <section class="card" id="secTxt" aria-labelledby="txtH">
 <div class="sec-h"><h2 id="txtH"><span class="n">4</span>Letter text</h2><span class="badge" id="tplBadge" role="status">Using default template</span></div>
+<div class="edit-lang" id="editLangRow" hidden><span class="mini">Editing:</span><div class="seg" id="editSeg" role="group" aria-label="Which letter to edit"><button type="button" data-v="en" aria-pressed="true">English letter</button><button type="button" data-v="th" aria-pressed="false">ไทย letter</button></div></div>
 <label for="subj">Subject</label><input id="subj">
 <label for="body">Body</label>
 <div class="chips" role="group" aria-label="Insert a placeholder at the cursor"><span class="mini">Insert:</span><button type="button" class="chip" data-v="{{name}}">{{name}}</button><button type="button" class="chip" data-v="{{org}}">{{org}}</button><button type="button" class="chip" data-v="{{position}}">{{position}}</button><button type="button" class="chip" data-v="{{replyBy}}">{{replyBy}}</button></div>
@@ -255,7 +257,9 @@ sponsors:{n:'Sponsors',d:'Template to be added',pos:'Position (e.g. Head of CSR)
 const $=id=>document.getElementById(id);let party='schools',custom=false;
 const roles={internal:[['prehack','Pre-Hack Judge'],['mentor','Mentor']],external:[['judge','Hackathon Judge (Day 2)'],['keynote','Keynote Speaker (Day 1)']]};
 const R={prehack:true,mentor:true,judge:true,keynote:false};
-const lang=()=>$('lay').value,tplKey=()=>'tpl_'+party+'_'+(lang()=='both'?'en':lang()),setEnc=()=>{$('enc').value=lang()=='th'?P[party].encTh:P[party].enc};
+// In "Both" mode the editor shows one letter at a time (bothEdit); unsaved edits to the other are kept in drafts.
+let bothEdit='en';const drafts={};
+const lang=()=>$('lay').value,editLang=()=>lang()=='both'?bothEdit:lang(),tplKey=()=>'tpl_'+party+'_'+editLang(),setEnc=()=>{$('enc').value=lang()=='th'?P[party].encTh:P[party].enc};
 const VENUE_EN='Satit Prasarnmit International Programme (SPIP), Bangkok, Thailand';
 const VENUE_TH='หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (SPIP), กรุงเทพมหานคร';
 const TH_INTRO='SPIP Hack 2027 เป็นการแข่งขันนวัตกรรมที่นักเรียนเป็นผู้จัด เปิดโอกาสให้นักเรียนมัธยมศึกษาจากหลายโรงเรียนเข้าร่วม ภายใต้หัวข้อ “City of Tomorrow” ทีมนักเรียนจะพัฒนาแนวคิดที่นำไปใช้ได้จริงเพื่อให้เมืองมีสุขภาพดี ยั่งยืน และน่าอยู่ยิ่งขึ้น ทีมที่ได้รับคัดเลือกจะเข้าร่วมกิจกรรมสองวัน ณ '+VENUE_TH+' กรุงเทพมหานคร ในวันที่ 6–7 มีนาคม พ.ศ. 2570 (วันที่อาจมีการเปลี่ยนแปลง)';
@@ -263,11 +267,11 @@ const ORGANIZER_EN='the SPIP Hack 2027 Organizing Committee';
 const ORGANIZER_LABEL_EN='SPIP Hack 2027 Organizing Committee';
 const ORGANIZER_TH='คณะผู้จัดงาน SPIP Hack 2027';
 const TH_CLOSE='\n\nคณะผู้จัดงานจะจัดเตรียมอาหารว่างและเครื่องดื่ม และมอบเกียรติบัตรเพื่อแสดงความขอบคุณตามความเหมาะสม จึงใคร่ขอความกรุณาแจ้งภายในวันที่ {{replyBy}} ';
-function gen(language=lang()){const o={subject:'',body:''},th=language=='th';const intro='SPIP Hack 2027 is a student-led, cross-school innovation competition for secondary students. Under the theme “City of Tomorrow”, teams develop practical ideas for healthier, more sustainable and better cities. Selected teams attend a two-day on-site hackathon held at '+VENUE_EN+', Bangkok, on 6–7 March 2027 (dates provisional).';
+function gen(language=lang()){const o={subject:'',body:''},th=language=='th';const intro='SPIP Hack 2027 is a student-led, cross-school innovation competition for secondary students. Under the theme “City of Tomorrow”, teams develop practical ideas for healthier, more sustainable and better cities. Selected teams attend a two-day on-site hackathon on 6–7 March 2027 (dates provisional).';
 if(party=='schools'){if(th){o.subject='ขอเชิญนักเรียนเข้าร่วมการแข่งขัน SPIP Hack 2027 “City of Tomorrow”';
 o.body='ด้วย หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร ขอเรียนเชิญ {{org}} เข้าร่วมกิจกรรม SPIP Hack 2027 ซึ่งเป็นการแข่งขันนวัตกรรมข้ามโรงเรียนที่นักเรียนเป็นผู้จัด สำหรับนักเรียนระดับมัธยมศึกษา\n\nหัวข้อของปีนี้คือ “City of Tomorrow” ทีมนักเรียน 2–4 คน ระดับ Year 9 / Grade 8 / ม.2 ขึ้นไป จะค้นหาปัญหาจริงในเมืองและพัฒนาแนวทางแก้ไขที่นำไปใช้ได้จริง การแข่งขันแบ่งเป็นสองช่วง ได้แก่ การส่งแนวคิด (Pre-Hack) ภายในวันที่ 13 กุมภาพันธ์ พ.ศ. 2570 และกิจกรรมแฮกกาธอนสองวัน ณ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (SPIP) กรุงเทพมหานคร ในวันที่ 6–7 มีนาคม พ.ศ. 2570 สำหรับทีมที่ได้รับคัดเลือกไม่เกิน 15 ทีม พร้อมคำแนะนำจากที่ปรึกษา การนำเสนอรอบสุดท้าย และพิธีมอบรางวัล นักเรียนไม่จำเป็นต้องมีประสบการณ์ด้านการเขียนโปรแกรมหรือการเป็นผู้ประกอบการ และไม่จำเป็นต้องมีต้นแบบที่ใช้งานได้จริง\n\nคณะผู้จัดงานใคร่ขอความอนุเคราะห์ในการเผยแพร่ข้อมูลที่แนบมาแก่นักเรียนและครูที่สนใจ และแจ้งให้ทราบหากทางโรงเรียนสนใจเข้าร่วม ทีมที่ประกอบด้วยนักเรียนจากต่างโรงเรียนสามารถเข้าร่วมได้ วันที่ทั้งหมดอาจมีการเปลี่ยนแปลง โดยจะแจ้งผ่านช่องทางทางการของ SPIP Hack\n\nหากมีข้อสงสัย สามารถติดต่อได้ที่ hackathon@spip.in.th คณะผู้จัดงานยินดีเป็นอย่างยิ่งที่จะได้ต้อนรับนักเรียนของท่านสู่ SPIP Hack 2027';}
 else{o.subject='Invitation to participate: SPIP Hack 2027 “City of Tomorrow”';
-o.body='On behalf of the SPIP Hack 2027 Organizing Committee, we are pleased to invite {{org}} to take part in SPIP Hack 2027, a student-led, cross-school innovation competition for secondary students.\n\nThis year’s theme is “City of Tomorrow”. Teams of two to four students from Year 9 / Grade 8 / M.2 and above identify a real-world urban problem and develop a practical solution. The competition has two stages: a Pre-Hack idea submission (deadline 13 February 2027), followed by a two-day on-site hackathon held at Satit Prasarnmit International Programme (SPIP), Bangkok, on 6–7 March 2027 for up to 15 selected teams, with mentor feedback, final presentations and awards. No prior coding or entrepreneurship experience is required, and a working prototype is not needed.\n\nWe would be grateful if you could share the enclosed information with eligible students and teachers and let us know if your school is interested. Mixed-school teams are welcome. All dates are provisional and will be confirmed through official SPIP Hack communications.\n\nShould you have any questions, please contact us at hackathon@spip.in.th. We would be honoured to welcome your students to SPIP Hack 2027.';}}
+o.body='On behalf of the SPIP Hack 2027 Organizing Committee, we are pleased to invite {{org}} to take part in SPIP Hack 2027, a student-led, cross-school innovation competition for secondary students.\n\nThis year’s theme is “City of Tomorrow”. Teams of two to four students from Year 9 / Grade 8 / M.2 and above identify a real-world urban problem and develop a practical solution. The competition has two stages: a Pre-Hack idea submission (deadline 13 February 2027), followed by a two-day on-site hackathon on 6–7 March 2027 for up to 15 selected teams, with mentor feedback, final presentations and awards. No prior coding or entrepreneurship experience is required, and a working prototype is not needed.\n\nWe would be grateful if you could share the enclosed information with eligible students and teachers and let us know if your school is interested. Mixed-school teams are welcome. All dates are provisional and will be confirmed through official SPIP Hack communications.\n\nShould you have any questions, please contact us at hackathon@spip.in.th. We would be honoured to welcome your students to SPIP Hack 2027.';}}
 else if(party=='internal'){const a=[];if(R.prehack)a.push(th?'ผู้ตัดสินรอบ Pre-Hack':'Pre-Hack Judge');if(R.mentor)a.push(th?'ที่ปรึกษา (Mentor)':'Mentor');
 if(th){o.subject='ขอเชิญเป็น'+(a.join(' และ ')||'[บทบาท]')+' ในงาน SPIP Hack 2027';let b='คณะผู้จัดงานขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027 ในบทบาท '+(a.join(' และ ')||'[บทบาท]')+' '+TH_INTRO+'\n\nความเชี่ยวชาญและประสบการณ์ของท่านจะเป็นประโยชน์อย่างยิ่งต่อทีมนักเรียน';
 if(R.prehack)b+='\n\nผู้ตัดสินรอบ Pre-Hack (14–20 กุมภาพันธ์ พ.ศ. 2570): ท่านจะให้คะแนนข้อเสนอของทีมอย่างอิสระโดยใช้เกณฑ์เดียวกัน จากนั้นคะแนนจะถูกรวมและจัดอันดับ ชื่อโรงเรียนจะถูกซ่อนในการให้คะแนนเบื้องต้น หากท่านรู้จักทีมใดทีมหนึ่ง กรุณาแจ้งคณะผู้จัดงานเพื่อมอบหมายทีมอื่นแทน การให้คะแนนรอบ Pre-Hack ดำเนินการทางออนไลน์ [เวลาโดยประมาณ: ___]';
@@ -305,7 +309,7 @@ o.body=`<p>ในนามของคณะผู้จัดงาน SPIP Hac
 }else{
 o.subject='Partnership invitation: SPIP Hack 2027 “City of Tomorrow”';
 o.body=`<p>On behalf of the SPIP Hack 2027 Organizing Committee, we are pleased to invite {{org}} to explore a potential partnership with SPIP Hack 2027, a student-led, cross-school innovation competition for secondary students under the theme “City of Tomorrow.”</p>
-<p>The event is provisionally scheduled for March 6–7, 2027, at ${VENUE_EN}, Bangkok, Thailand, and will bring together up to 15 finalist teams, each comprising 2–4 students.</p>
+<p>The event is provisionally scheduled for March 6–7, 2027, at ${VENUE_EN}, and will bring together up to 15 finalist teams, each comprising 2–4 students.</p>
 <p>The competition encourages students to identify real-world urban challenges and develop practical solutions to make cities healthier, more sustainable, and better places to live. Through mentorship and final presentations to a judging panel, participants will have the opportunity to develop their ideas into meaningful innovations.</p>
 <p>Given {{org}}’s work in health, nutrition, and consumer well-being, we believe there may be a potential alignment with the goals of our event. We would be grateful for your consideration of support in one or more of the following forms:</p>
 <ul>
@@ -318,22 +322,36 @@ o.body=`<p>On behalf of the SPIP Hack 2027 Organizing Committee, we are pleased 
 <p>Should you require further information, please contact us at hackathon@spip.in.th by November 20, 2026.</p>`;
 }
 }
-o.body=o.body.replaceAll('โดย หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร กำหนดจัดกิจกรรมในวันที่','โดยจัดกิจกรรมในวันที่').replaceAll('Satit Prasarnmit International Programme of Srinakharinwirot University Prasarnmit Demonstration School (Secondary) (SPIP), Bangkok',ORGANIZER_EN).replaceAll('หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร',ORGANIZER_TH).replaceAll('ด้วย '+ORGANIZER_TH,'ด้วย'+ORGANIZER_TH).replaceAll('โดย '+ORGANIZER_TH,'โดย'+ORGANIZER_TH).replaceAll('คณะผู้จัดงานขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027',ORGANIZER_TH+' ขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027').replaceAll('We are writing to invite you to support SPIP Hack 2027','On behalf of '+ORGANIZER_EN+', we are writing to invite you to support SPIP Hack 2027').replaceAll('Satit Prasarnmit International Programme (SPIP), Bangkok',VENUE_EN).replaceAll('โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (SPIP) กรุงเทพมหานคร',VENUE_TH);
-o.body=o.body.replaceAll('ณ '+VENUE_TH+' กรุงเทพมหานคร ในวันที่','ในวันที่').replaceAll('ณ '+VENUE_TH+' ในวันที่','ในวันที่').replaceAll('held at '+VENUE_EN+', ','').replaceAll('at '+VENUE_EN+', ','');
-o.body+='\n\n'+(th?'สถานที่จัดงานคือ'+VENUE_TH:'The event will be held at '+VENUE_EN+'.');
+o.body=o.body.replaceAll('โดย หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร กำหนดจัดกิจกรรมในวันที่','โดยจัดกิจกรรมในวันที่').replaceAll('Satit Prasarnmit International Programme of Srinakharinwirot University Prasarnmit Demonstration School (Secondary) (SPIP), Bangkok',ORGANIZER_EN).replaceAll('หลักสูตรนานาชาติ โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (ฝ่ายมัธยม) กรุงเทพมหานคร',ORGANIZER_TH).replaceAll('ด้วย '+ORGANIZER_TH,'ด้วย'+ORGANIZER_TH).replaceAll('โดย '+ORGANIZER_TH,'โดย'+ORGANIZER_TH).replaceAll('คณะผู้จัดงานขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027',ORGANIZER_TH+' ขอเรียนเชิญท่านร่วมสนับสนุน SPIP Hack 2027').replaceAll('We are writing to invite you to support SPIP Hack 2027','On behalf of '+ORGANIZER_EN+', we are writing to invite you to support SPIP Hack 2027').replaceAll('โรงเรียนสาธิตมหาวิทยาลัยศรีนครินทรวิโรฒ ประสานมิตร (SPIP) กรุงเทพมหานคร',VENUE_TH);
+o.body=o.body.replaceAll('ณ '+VENUE_TH+' กรุงเทพมหานคร ในวันที่','ในวันที่').replaceAll('ณ '+VENUE_TH+' ในวันที่','ในวันที่');
+if(party!='sponsors')o.body+='\n\n'+(th?'สถานที่จัดงานคือ'+VENUE_TH:'The event will be held at '+VENUE_EN+'.');
 return o;}
 function localized(enId,thId,language=lang()){return $(language=='th'?thId:enId).value}
-function fill(t,language=lang()){return t.replace(/\{\{(\w+)\}\}/g,(m,k)=>({name:$('sal').value+' '+localized('nameEn','nameTh',language),org:localized('orgEn','orgTh',language),position:localized('positionEn','positionTh',language),replyBy:$('reply').value}[k]||'[ '+k+' ]').trim());}
+// Title + name in the letter's language: "Mr." becomes "คุณ" in a Thai letter, "ดร." becomes "Dr." in an English one.
+const TITLE_TH={'Mr.':'คุณ','Ms.':'คุณ','Mrs.':'คุณ','Khun':'คุณ','Dr.':'ดร.','Prof.':'ศ.','Assoc. Prof.':'รศ.'},TITLE_EN={'คุณ':'Khun','ดร.':'Dr.','ศ.':'Prof.','รศ.':'Assoc. Prof.','ผศ.':'Asst. Prof.','ท่าน':''};
+function fullName(language=lang()){const s=$('sal').value,n=localized('nameEn','nameTh',language).trim();if(!n)return '';
+if(language=='th')return (TITLE_TH[s]??s)+n;return ((TITLE_EN[s]??s)+' '+n).trim()}
+// Reply-by date: "15 November 2026" or "November 15, 2026" is written as a Thai date in Thai letters.
+const MONTHS_EN=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+function replyBy(language=lang()){const v=$('reply').value.trim();if(language!='th')return v;
+const m=v.match(/^(\d{1,2})\s+([a-z]+)\.?,?\s+(\d{4})$/i)||v.match(/^([a-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/i);if(!m)return v;
+const [d,mo]=/^\d/.test(m[1])?[m[1],m[2]]:[m[2],m[1]],i=MONTHS_EN.indexOf(mo.slice(0,3).toLowerCase());if(i<0||+d<1||+d>31)return v;
+return thDate(m[3]+'-'+String(i+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'))}
+function fill(t,language=lang()){return t.replace(/\{\{(\w+)\}\}/g,(m,k)=>({name:fullName(language),org:localized('orgEn','orgTh',language),position:localized('positionEn','positionTh',language),replyBy:replyBy(language)}[k]||'[ '+k+' ]').trim());}
 function editorHTML(value){
   const v=String(value??'');
   if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|br|span|h[1-6])\b/i.test(v))return v;
   return v.split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')||'<p><br></p>';
 }
-function load(){const o=gen(lang()=='both'?'en':lang()),s=localStorage.getItem(tplKey());try{if(s){const t=JSON.parse(s);o.subject=t.subject;o.body=t.body;custom=true}else custom=false}catch(e){custom=false}
-$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body)}
+function load(){const l=editLang(),o=gen(l),d=drafts[l];delete drafts[l];
+if(d){o.subject=d.subject;o.body=d.body;custom=true}else try{const s=localStorage.getItem(tplKey());if(s){const t=JSON.parse(s);o.subject=t.subject;o.body=t.body;custom=true}else custom=false}catch(e){custom=false}
+$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body);return !!d}
+// Text of one letter: the editor if it is showing that letter, else an unsaved draft, a saved template or the default.
+function textFor(l){if(l==editLang())return{subject:$('subj').value,body:$('body').innerHTML};if(drafts[l])return drafts[l];
+const o=gen(l);try{const s=localStorage.getItem('tpl_'+party+'_'+l);if(s){const t=JSON.parse(s);o.subject=t.subject;o.body=t.body}}catch(e){}return o}
 function rolesUI(){const r=roles[party]||[];$('roles').innerHTML=r.length?'<h2 style="margin-top:14px">Roles offered</h2>':'';
-r.forEach(([k,l])=>{const d=document.createElement('div');d.className='chk';d.innerHTML='<input type="checkbox" '+(R[k]?'checked':'')+'><span>'+l+'</span>';d.firstChild.onchange=e=>{R[k]=e.target.checked;if(!custom){const o=gen();$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body)}draw()};$('roles').appendChild(d)})}
-function pick(k){party=k;document.querySelectorAll('.party').forEach(b=>b.classList.toggle('on',b.dataset.k==k));$('positionEn').placeholder=P[k].pos;$('orgEn').placeholder=P[k].org;setEnc();
+r.forEach(([k,l])=>{const d=document.createElement('div');d.className='chk';d.innerHTML='<input type="checkbox" '+(R[k]?'checked':'')+'><span>'+l+'</span>';d.firstChild.onchange=e=>{R[k]=e.target.checked;if(!custom){const o=gen(editLang());$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body)}draw()};$('roles').appendChild(d)})}
+function pick(k){party=k;for(const l in drafts)delete drafts[l];document.querySelectorAll('.party').forEach(b=>b.classList.toggle('on',b.dataset.k==k));$('positionEn').placeholder=P[k].pos;$('orgEn').placeholder=P[k].org;setEnc();
 $('sponNote').style.display='none';load();rolesUI();draw()}
 function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function thDate(v){const f=new Intl.DateTimeFormat('th-TH-u-ca-buddhist',{day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(v+'T00:00')),g=t=>(f.find(p=>p.type==t)||{}).value;return g('day')+' '+g('month')+' พ.ศ. '+g('year')}
@@ -385,7 +403,7 @@ function paras(t,language){
 }
 // Pages: every .sheet is exactly one A4 page with its own watermark and footer. Letter blocks
 // flow into a page until it is full, then continue on a new one. Long paragraphs are split by line.
-function newPage(cls,foot,cont){const s=el('div','sheet '+cls);
+function newPage(cls,foot,cont){const s=el('div','sheet '+cls+(cont?' cont':''));
 if($('wm').checked){const w=el('img','wm');w.src=LOGO;w.style.opacity=$('wmo').value/100;s.appendChild(w)}
 const c=el('div','content measuring'+(cont?' cont':''));s.appendChild(c);s.appendChild(el('div','foot',foot));$('pv').appendChild(s);return c}
 // Extra room (px) kept free at the bottom of each page; raised only while exporting, when needed.
@@ -435,12 +453,12 @@ const T={en:{ref:'Ref: ',subj:'Subject: ',dear:'Dear ',dearEnd:',',close:'Sincer
 th:{ref:'ที่ ',subj:'เรื่อง  ',dear:'เรียน  ',dearEnd:'',close:'ขอแสดงความนับถือ',sig:'ลายมือชื่อ',date:'วันที่ลงนาม: ____________________',enc:'สิ่งที่ส่งมาด้วย  ',stamp:'ตราประทับ',nm:'[ชื่อ-นามสกุล]',ps:'[ตำแหน่ง]',fb:'ท่าน'}};
 function draw(){$('pv').innerHTML='';
 if(lang()!='both'){letter(lang(),$('subj').value,$('body').innerHTML,$('enc').value,false);return}
-letter('en',$('subj').value,$('body').innerHTML,$('enc').value,true);
-const thaiText=gen('th');try{const saved=localStorage.getItem('tpl_'+party+'_th');if(saved){const template=JSON.parse(saved);thaiText.subject=template.subject;thaiText.body=template.body}}catch(e){}
-letter('th',thaiText.subject,thaiText.body,P[party].encTh,true)}
+const en=textFor('en'),th=textFor('th');
+letter('en',en.subject,en.body,$('enc').value,true);
+letter('th',th.subject,th.body,P[party].encTh,true)}
 function letter(language,subject,body,enc,bilingual){const th=language=='th',t=T[th?'th':'en'],B=[];
 const lg=el('div','logo');const im=el('img');im.src=LOGO;if(logoProbe.naturalWidth){im.width=logoProbe.naturalWidth;im.height=logoProbe.naturalHeight}lg.appendChild(im);B.push(lg);
-const v=$('date').value,nm=$('addresseeMode').value==='named'?($('sal').value+' '+localized('nameEn','nameTh',language)).trim():'',position=localized('positionEn','positionTh',language),org=localized('orgEn','orgTh',language),address=localized('addrEn','addrTh',language);
+const v=$('date').value,nm=$('addresseeMode').value==='named'?fullName(language):'',position=localized('positionEn','positionTh',language),org=localized('orgEn','orgTh',language),address=localized('addrEn','addrTh',language);
 const d=v?(th?thDate(v):new Date(v+'T00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})):'';
 const m=el('div','meta');m.appendChild(el('span',null,$('ref').value.trim()?t.ref+$('ref').value.trim():''));m.appendChild(el('span',null,d));B.push(m);
 B.push(el('div','rcpt',[nm,position,org,address].filter(Boolean).join('\n')));
@@ -458,7 +476,7 @@ const dl=el('div',null,t.date);dl.style.marginTop='4mm';c.appendChild(dl);rw.app
 g.appendChild(rw);if($('stamp').checked)g.appendChild(el('div','stamp',t.stamp));B.push(g);
 paginate(B,th?'th':'en','SPIP Hack 2027 · '+(th?VENUE_TH:VENUE_EN)+' · hackathon@spip.in.th')}
 Object.keys(P).forEach(k=>{const b=el('button','party');b.dataset.k=k;b.innerHTML=P[k].n+'<small>'+P[k].d+'</small>';b.onclick=()=>pick(k);$('parties').appendChild(b)});
-['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s2nEn','s2nTh','s2p','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode'].forEach(i=>$(i).addEventListener(i==='addresseeMode'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')$('namedFields').style.display=$('addresseeMode').value==='named'?'block':'none';draw()}));
+['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s2nEn','s2nTh','s2p','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode'].forEach(i=>$(i).addEventListener(i==='addresseeMode'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){bothEdit='en';for(const l in drafts)delete drafts[l];setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')$('namedFields').style.display=$('addresseeMode').value==='named'?'block':'none';draw()}));
 // Rich-text toolbar actions
 document.querySelectorAll('.editor-toolbar [data-command]').forEach(btn=>{
   btn.onmousedown=e=>e.preventDefault();
@@ -565,11 +583,15 @@ $('print').onclick=async()=>{if(document.fonts?.ready)await document.fonts.ready
 // ---- Interface helpers. They only change the form; the letter, PDF and print output are untouched. ----
 $('hdLogo').src=LOGO;
 const UI=$('ui'),segBtns=[...document.querySelectorAll('#laySeg button')];let edited=false,booted=false;
-function syncLang(){const v=lang();UI.dataset.lang=v;segBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==v))}
+function syncLang(){const v=lang();UI.dataset.lang=v;segBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==v));syncEdit()}
+const editBtns=[...document.querySelectorAll('#editSeg button')];
+function syncEdit(){$('editLangRow').hidden=lang()!='both';editBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==bothEdit))}
+editBtns.forEach(b=>b.onclick=()=>{if(b.dataset.v==bothEdit)return;if(edited)drafts[bothEdit]={subject:$('subj').value,body:$('body').innerHTML};
+bothEdit=b.dataset.v;load();syncEdit();detSum();draw()});
 segBtns.forEach(b=>b.onclick=()=>{if(lang()==b.dataset.v)return;$('lay').value=b.dataset.v;$('lay').dispatchEvent(new Event('input'));syncLang();detSum()});
 function hasSaved(){try{return !!localStorage.getItem(tplKey())}catch(e){return false}}
 function updBadge(){const b=$('tplBadge'),s=hasSaved();b.textContent=s?(edited?'Your template · edited':'Using your template'):(edited?'Edited · not saved':'Using default template');b.className='badge'+(s&&!edited?' mine':edited?' edit':'')}
-const baseLoad=load;load=function(){baseLoad();edited=false;updBadge()};
+const baseLoad=load;load=function(){edited=baseLoad();updBadge()};
 const basePick=pick;pick=function(k){const changed=k!==party;basePick(k);document.querySelectorAll('.party').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k==k));detSum();if(booted&&changed)toast(P[k].n+' template loaded'+(hasSaved()?' (your saved version)':''))};
 ['body','subj'].forEach(i=>$(i).addEventListener('input',()=>{edited=true;updBadge();if(i=='body')detSum()}));
 let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
