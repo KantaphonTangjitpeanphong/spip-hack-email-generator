@@ -11,13 +11,34 @@
 .editor:hover{border-color:#B9B4CB}
 .editor:focus-within{border-color:var(--purple);box-shadow:0 0 0 3px rgba(46,230,200,.35)}
 .editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;padding:6px;border-bottom:1px solid var(--line);background:var(--bg)}
-.editor-toolbar button{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:500 13px/1 var(--font-body);cursor:pointer}
-.editor-toolbar button:hover{background:var(--line)}
-.editor-toolbar button:focus-visible{outline:2px solid var(--purple);outline-offset:1px}
+/* Toolbar buttons (fixed toolbar and selection toolbar) */
+.tbtn{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:32px;height:32px;padding:0 7px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:500 13px/1 var(--font-body);cursor:pointer}
+.tbtn:hover{background:var(--line)}
+.tbtn[aria-pressed="true"]{background:#E9E4F6;color:var(--purple)}
+.tbtn:focus-visible{outline:2px solid var(--purple);outline-offset:1px}
+.ti-b{font-weight:800;font-size:14px}.ti-i{font:italic 600 15px Georgia,serif}.ti-u,.ti-s{font-weight:600;font-size:14px}
+.tsep{flex:none;width:1px;height:20px;margin:0 3px;background:var(--line-strong)}
+/* Selection toolbar: floats above selected text */
+.bubble{position:fixed;z-index:60;top:0;left:0;padding:2px;background:#fff;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 28px -10px rgba(27,22,48,.4),0 1px 3px rgba(27,22,48,.1);opacity:0;transition:opacity .12s}
+.bubble.show{opacity:1}.bubble[hidden],.bubble [hidden]{display:none!important}
+.bmain,.blink{display:flex;align-items:center;gap:1px;height:32px}
+.bblock{position:relative}.tblock{font-weight:600;padding:0 4px 0 8px}
+.bmenu{position:absolute;top:calc(100% + 6px);left:-2px;min-width:150px;padding:4px;background:#fff;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 28px -10px rgba(27,22,48,.4)}
+.bitem{display:block;width:100%;min-height:32px;padding:0 10px;border:0;border-radius:7px;background:none;text-align:left;font:500 13px var(--font-body);color:var(--ink);cursor:pointer}
+.bitem:hover,.bitem:focus-visible{background:var(--line);outline:none}.bitem[aria-checked="true"]{color:var(--purple);font-weight:600}
+.bitem[data-cmd="h1"]{font-size:15px;font-weight:700}.bitem[data-cmd="h2"]{font-size:14px;font-weight:700}
+.blink input{width:220px;height:30px;padding:0 8px;border:1px solid var(--line-strong);border-radius:7px;font:13px var(--font-body);color:var(--ink);outline:none}
+.blink input:focus{border-color:var(--purple)}.blink input[aria-invalid="true"]{border-color:var(--red)}
+.berr{position:absolute;top:calc(100% + 4px);left:0;padding:4px 8px;border-radius:6px;background:#FFF2F2;color:#8E0F16;font-size:12px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.bubble{transition:none}}
+.kbd{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin:8px 0 0}.kbd dt,.kbd dd{margin:0}
+.kbd kbd{display:inline-block;min-width:20px;padding:1px 6px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;background:#fff;font:500 11.5px var(--font-body);color:var(--ink);text-align:center}
 .tb-group{display:inline-flex;gap:2px;padding-right:6px;margin-right:4px;border-right:1px solid var(--line-strong)}
 .document-editor{min-height:320px;padding:12px 14px;color:var(--ink);background:#fff;font:14px/1.6 var(--font-body);text-align:left;overflow-wrap:anywhere;outline:none}
 .document-editor p{margin:0 0 10px}
 .document-editor ul,.document-editor ol{margin:0 0 10px;padding-left:22px}
+.document-editor blockquote{margin:0 0 10px;padding-left:12px;border-left:3px solid var(--line-strong);color:#3A3550}.document-editor blockquote p{margin:0}
+#ui .document-editor h1,#ui .document-editor h2{display:block;margin:0 0 8px;font:700 20px/1.3 var(--font-body);letter-spacing:0;color:var(--ink);text-transform:none}#ui .document-editor h2{font-size:17px}.document-editor a{color:var(--purple)}
 *{box-sizing:border-box}
 /* Brand tokens from SpipHack27_LandingPage css/style.css :root, inverted for a light page */
 :root{--purple:#4B3F78;--magenta:#C4449A;--orange:#F2622A;--red:#E8141C;--cyan:#2EE6C8;--teal:#16968A;--on-cyan:#04211D;
@@ -134,7 +155,9 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 .sheet>.content{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}.content.measuring .sign,.content.cont .sign{margin-top:0}
 .wm{position:absolute;left:50%;top:52%;width:195mm;max-width:96%;height:auto;transform:translate(-50%,-50%);pointer-events:none;mix-blend-mode:multiply}
 .sheet{position:relative}.sheet>*:not(.wm){position:relative;z-index:1}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.body ul{margin:0 0 3.2mm;padding-left:7mm}.body li{margin-bottom:1mm}
+.body ul,.body ol{margin:0 0 3.2mm;padding-left:7mm}.body li{margin-bottom:1mm}.body li ul,.body li ol{margin:1mm 0 0}
+.body blockquote{margin:0 0 3.2mm;padding-left:4mm;border-left:2px solid #999}.body blockquote p{margin:0}
+.body h1{margin:0 0 3mm;font-size:1.35em;line-height:1.3}.body h2{margin:0 0 2.5mm;font-size:1.15em;line-height:1.3}.body a{color:inherit;text-decoration:underline}
 .en{font-family:Arial,Helvetica,sans-serif;font-size:11.5pt;line-height:1.58}
 .th{font-family:'TH Sarabun New',Sarabun,Thonburi,Tahoma,'Noto Sans Thai',sans-serif;font-size:12pt;line-height:1.55}
 .sheet+.sheet{margin-top:24px}.sheet.cont{padding-top:18mm}
@@ -207,23 +230,7 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 <label for="body">Body</label>
 <div class="chips" role="group" aria-label="Insert a placeholder at the cursor"><span class="mini">Insert:</span><button type="button" class="chip" data-v="{{name}}">{{name}}</button><button type="button" class="chip" data-v="{{org}}">{{org}}</button><button type="button" class="chip" data-v="{{position}}">{{position}}</button><button type="button" class="chip" data-v="{{replyBy}}">{{replyBy}}</button></div>
 <div class="editor">
-  <div class="editor-toolbar" role="toolbar" aria-label="Text formatting">
-    <span class="tb-group">
-      <button type="button" data-command="bold" title="Bold" aria-label="Bold"><strong>B</strong></button>
-      <button type="button" data-command="italic" title="Italic" aria-label="Italic"><em>I</em></button>
-      <button type="button" data-command="underline" title="Underline" aria-label="Underline"><u>U</u></button>
-    </span>
-    <span class="tb-group">
-      <button type="button" data-command="insertUnorderedList" title="Bulleted list">• List</button>
-      <button type="button" data-command="insertOrderedList" title="Numbered list">1. List</button>
-    </span>
-    <span class="tb-group">
-      <button type="button" data-command="justifyLeft" title="Align left">Left</button>
-      <button type="button" data-command="justifyCenter" title="Center">Center</button>
-      <button type="button" data-command="justifyRight" title="Align right">Right</button>
-    </span>
-    <button type="button" id="clearFormatting" title="Clear formatting">Clear</button>
-  </div>
+  <div class="editor-toolbar" id="fixedBar" role="toolbar" aria-label="Text formatting"></div>
 
   <div
     id="body"
@@ -235,7 +242,8 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
     spellcheck="true"
   ></div>
 </div>
-<small class="help" id="bodyHelp">Leave a blank line to start a new paragraph.</small>
+<small class="help" id="bodyHelp">Press Enter for a new paragraph. Select text to format it.</small>
+<details class="tip" id="kbdHelp"><summary>Keyboard shortcuts</summary><dl class="kbd" id="kbdList"></dl></details>
 <div class="bar"><button class="sec" id="save">Save as my template</button><button class="sec" id="reset">Reset to default</button><span class="mini" id="tplMsg" role="status" aria-live="polite"></span></div>
 <div class="note" id="sponNote" style="display:none">Sponsor template is not set yet. Write or paste your structure above, then press "Save as my template".</div>
 </section>
@@ -340,7 +348,7 @@ return thDate(m[3]+'-'+String(i+1).padStart(2,'0')+'-'+String(d).padStart(2,'0')
 function fill(t,language=lang()){return t.replace(/\{\{(\w+)\}\}/g,(m,k)=>({name:fullName(language),org:localized('orgEn','orgTh',language),position:localized('positionEn','positionTh',language),replyBy:replyBy(language)}[k]||'[ '+k+' ]').trim());}
 function editorHTML(value){
   const v=String(value??'');
-  if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|br|span|h[1-6])\b/i.test(v))return v;
+  if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|s|strike|del|a|blockquote|br|span|h[1-6])\b/i.test(v))return v;
   return v.split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')||'<p><br></p>';
 }
 function load(){const l=editLang(),o=gen(l),d=drafts[l];delete drafts[l];
@@ -357,38 +365,19 @@ function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 function thDate(v){const f=new Intl.DateTimeFormat('th-TH-u-ca-buddhist',{day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(v+'T00:00')),g=t=>(f.find(p=>p.type==t)||{}).value;return g('day')+' '+g('month')+' พ.ศ. '+g('year')}
 function paras(t,language){
   const raw=String(t??'');
-  if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|br|span|h[1-6])\b/i.test(raw)){
+  if(/<\/?(?:p|div|ul|ol|li|strong|b|em|i|u|s|strike|del|a|blockquote|br|span|h[1-6])\b/i.test(raw)){
     const tpl=document.createElement('template');
-    tpl.innerHTML=raw;
+    tpl.innerHTML=cleanHTML(raw);
     const walker=document.createTreeWalker(tpl.content,NodeFilter.SHOW_TEXT);
     let n;
     while((n=walker.nextNode()))n.nodeValue=fill(n.nodeValue,language);
-
-    const blocks=[];
-    function collect(node){
-      [...node.childNodes].forEach(child=>{
-        if(child.nodeType!==Node.ELEMENT_NODE){
-          if(child.textContent.trim()){
-            const w=el('div','body');
-            w.appendChild(el('p',null,child.textContent));
-            blocks.push(w);
-          }
-          return;
-        }
-        if(['P','UL','OL','H1','H2','H3','H4','H5','H6'].includes(child.tagName)){
-          const w=el('div','body');
-          w.appendChild(child.cloneNode(true));
-          blocks.push(w);
-        }else if(child.tagName==='DIV'){
-          collect(child);
-        }else{
-          const w=el('div','body');
-          w.appendChild(child.cloneNode(true));
-          blocks.push(w);
-        }
-      });
-    }
-    collect(tpl.content);
+    // Each block becomes one piece for pagination; loose inline content is gathered into a paragraph.
+    const blocks=[];let cur=null;
+    [...tpl.content.childNodes].forEach(ch=>{
+      if(ch.nodeType===1&&/^(P|UL|OL|H1|H2|BLOCKQUOTE)$/.test(ch.tagName)){cur=null;const w=el('div','body');w.appendChild(ch.cloneNode(true));blocks.push(w);return}
+      if(!cur){if(ch.nodeType===3&&!ch.data.trim())return;cur=el('p');const w=el('div','body');w.appendChild(cur);blocks.push(w)}
+      cur.appendChild(ch.cloneNode(true));
+    });
     return blocks.length?blocks:[para('')];
   }
   return fill(raw,language).split(/\n\s*\n/).map(p=>{
@@ -420,21 +409,30 @@ if(!thWords||!/[฀-๿]/.test(w)){out.push(w);return}
 let cur='',word=false;for(const s of thWords.segment(w)){if(s.isWordLike&&word){out.push(cur);cur='';word=false}cur+=s.segment;if(s.isWordLike)word=true}if(cur)out.push(cur)});return out}
 const lineH=x=>parseFloat(getComputedStyle(x).lineHeight)||20,hgt=x=>x.getBoundingClientRect().height;
 function para(t){const w=el('div','body');w.appendChild(el('p',null,t));return w}
-// Keeps the longest start of paragraph x for which ok() holds; returns the remaining text, or null if nothing fits.
-function cut(x,ok){const text=x.textContent,parts=pieces(text);let lo=0,hi=parts.length-1;
-while(lo<hi){const mid=(lo+hi+1)>>1;x.textContent=parts.slice(0,mid).join('');if(ok())lo=mid;else hi=mid-1}
-if(!lo){x.textContent=text;return null}
-x.textContent=parts.slice(0,lo).join('').trimEnd();if(getComputedStyle(x).textAlign=='justify')x.style.textAlignLast='justify';return parts.slice(lo).join('').trimStart()}
+// Copy of element src holding only its text from character a to b, keeping formatting (bold, links...).
+function sliceEl(src,a,b){const c=src.cloneNode(true),w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT),drop=[];let n,pos=0;
+while((n=w.nextNode())){if(n.nodeType===3){const s=pos;pos+=n.data.length;const f=Math.max(a,s)-s,t=Math.min(b,pos)-s;n.data=t>f?n.data.slice(f,t):''}
+else if(n.tagName=='BR'&&(a>0&&pos<=a||pos>=b))drop.push(n)}
+drop.forEach(x=>x.remove());[...c.querySelectorAll('*')].reverse().forEach(x=>{if(x.tagName!='BR'&&!x.textContent&&!x.querySelector('br'))x.remove()});return c}
+// Keeps the longest start of paragraph x for which ok() holds; returns the rest as an element, or null if nothing fits.
+function cut(x,ok){const orig=x.cloneNode(true),text=x.textContent,parts=pieces(text),ends=[];let acc=0;parts.forEach(p=>ends.push(acc+=p.length));
+const show=e=>x.replaceChildren(...sliceEl(orig,0,e).childNodes);let lo=0,hi=parts.length-1;
+while(lo<hi){const mid=(lo+hi+1)>>1;show(ends[mid-1]);if(ok())lo=mid;else hi=mid-1}
+if(!lo){x.replaceChildren(...orig.cloneNode(true).childNodes);return null}
+let end=ends[lo-1],start=end;while(end>0&&/\s/.test(text[end-1]))end--;while(start<text.length&&/\s/.test(text[start]))start++;
+show(end);if(getComputedStyle(x).textAlign=='justify')x.style.textAlignLast='justify';return sliceEl(orig,start,text.length)}
+function wrapBody(x){const w=el('div','body');w.appendChild(x);return w}
 // Shrinks an overflowing paragraph to what fits on the page and returns the rest, or null to move it whole.
 function split(w,c){const x=w.firstElementChild;if(!x)return null;
-if(x.tagName=='UL'){const u=el('ul'),rest=el('div','body');while(x.children.length>1&&!fits(c))u.prepend(x.lastElementChild);if(!fits(c)){x.append(...u.children);return null}rest.appendChild(u);return rest}
-const text=x.textContent,rest=cut(x,()=>fits(c));if(rest==null)return null;
+if(x.tagName=='UL'||x.tagName=='OL'){const u=x.cloneNode(false),rest=el('div','body');while(x.children.length>1&&!fits(c))u.prepend(x.lastElementChild);if(!fits(c)){x.append(...u.children);return null}
+if(x.tagName=='OL')u.start=(x.start||1)+x.children.length;rest.appendChild(u);return rest}
+const orig=x.cloneNode(true),rest=cut(x,()=>fits(c));if(rest==null)return null;
 // Never leave a single line at the bottom of a page.
-if(w.previousElementSibling&&hgt(x)<lineH(x)*1.5){x.textContent=text;x.style.textAlignLast='';return null}
-return para(rest)}
+if(w.previousElementSibling&&hgt(x)<lineH(x)*1.5){x.replaceChildren(...orig.childNodes);x.style.textAlignLast='';return null}
+return wrapBody(rest)}
 // The signature should not sit alone on a page: take the last paragraph (or its last 3 lines) along with it.
 function carry(w){const x=w.firstElementChild,lh=x&&lineH(x),h=x&&hgt(x);
-if(x&&x.tagName=='P'&&h>lh*6.5){const rest=cut(x,()=>hgt(x)<=h-lh*2.5);if(rest!=null)return para(rest)}
+if(x&&x.tagName=='P'&&h>lh*6.5){const rest=cut(x,()=>hgt(x)<=h-lh*2.5);if(rest!=null)return wrapBody(rest)}
 if(!w.previousElementSibling)return null;w.remove();return w}
 function paginate(blocks,cls,foot){let c=newPage(cls,foot,false);const pages=[c],q=blocks.slice();
 while(q.length){const b=q.shift();c.appendChild(b);if(fits(c))continue;
@@ -477,28 +475,230 @@ g.appendChild(rw);if($('stamp').checked)g.appendChild(el('div','stamp',t.stamp))
 paginate(B,th?'th':'en','SPIP Hack 2027 · '+(th?VENUE_TH:VENUE_EN)+' · hackathon@spip.in.th')}
 Object.keys(P).forEach(k=>{const b=el('button','party');b.dataset.k=k;b.innerHTML=P[k].n+'<small>'+P[k].d+'</small>';b.onclick=()=>pick(k);$('parties').appendChild(b)});
 ['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s2nEn','s2nTh','s2p','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode'].forEach(i=>$(i).addEventListener(i==='addresseeMode'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){bothEdit='en';for(const l in drafts)delete drafts[l];setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')$('namedFields').style.display=$('addresseeMode').value==='named'?'block':'none';draw()}));
-// Rich-text toolbar actions
-document.querySelectorAll('.editor-toolbar [data-command]').forEach(btn=>{
-  btn.onmousedown=e=>e.preventDefault();
-  btn.onclick=()=>{
-    const editor=$('body');
-    editor.focus();
-    document.execCommand(btn.dataset.command,false,null);
-    editor.dispatchEvent(new Event('input',{bubbles:true}));
-  };
-});
-const clearButton=$('clearFormatting');
-if(clearButton){
-  clearButton.onmousedown=e=>e.preventDefault();
-  clearButton.onclick=()=>{
-    const editor=$('body');
-    editor.focus();
-    document.execCommand('removeFormat',false,null);
-    document.execCommand('formatBlock',false,'p');
-    editor.dispatchEvent(new Event('input',{bubbles:true}));
-  };
-}
-$('save').onclick=()=>{try{localStorage.setItem(tplKey(),JSON.stringify({subject:$('subj').value,body:$('body').innerHTML}));custom=true;tplNote('Template saved for '+P[party].n+' ✓')}catch(e){tplNote('Could not save in this browser.',true)}};
+// ---- Body editor. One command list (CMDS) drives the keyboard shortcuts, the fixed toolbar,
+// the selection toolbar and the shortcut help, so they always do the same thing. ----
+const ed=$('body'),IS_MAC=/Mac|iPhone|iPad|iPod/i.test(navigator.userAgentData?.platform||navigator.platform||navigator.userAgent);
+try{document.execCommand('styleWithCSS',false,false);document.execCommand('defaultParagraphSeparator',false,'p')}catch(e){}
+const exec=(c,v=null)=>document.execCommand(c,false,v);
+let lastRange=null;
+function edRange(){const s=getSelection();if(!s||!s.rangeCount)return null;const r=s.getRangeAt(0);return ed.contains(r.commonAncestorContainer)?r:null}
+function setRange(r){const s=getSelection();s.removeAllRanges();s.addRange(r);lastRange=r.cloneRange()}
+// Put focus and the last selection back in the editor (after a toolbar button or the link box had focus).
+function restoreRange(){if(document.activeElement===ed&&edRange())return;ed.focus({preventScroll:true});if(lastRange)setRange(lastRange)}
+function closestIn(sel){const r=edRange()||lastRange;if(!r)return null;let n=r.commonAncestorContainer;if(n.nodeType!==1)n=n.parentNode;const x=n&&n.closest&&n.closest(sel);return x&&ed.contains(x)?x:null}
+function selectText(n,a,b){const r=document.createRange();r.setStart(n,a);r.setEnd(n,b);setRange(r)}
+function selectNode(n){const r=document.createRange();r.selectNodeContents(n);setRange(r)}
+function blockTag(){const b=closestIn('h1,h2,blockquote');return b?b.tagName.toLowerCase():'p'}
+function setBlock(tag){exec('formatBlock','<'+(blockTag()==tag?'p':tag)+'>')}
+function clearFormat(){exec('removeFormat');const r=edRange();if(r&&!r.collapsed)exec('unlink');if(blockTag()!='p')exec('formatBlock','<p>')}
+const qs=c=>()=>{try{return document.queryCommandState(c)}catch(e){return false}};
+const svg=p=>'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';
+const dot=(x,y)=>'<circle cx="'+x+'" cy="'+y+'" r="1.1" fill="currentColor" stroke="none"/>';
+const CMDS=[
+ {id:'bold',label:'Bold',icon:'<b class="ti-b">B</b>',keys:['Mod','B'],active:qs('bold'),run:()=>exec('bold')},
+ {id:'italic',label:'Italic',icon:'<i class="ti-i">I</i>',keys:['Mod','I'],active:qs('italic'),run:()=>exec('italic')},
+ {id:'underline',label:'Underline',icon:'<u class="ti-u">U</u>',keys:['Mod','U'],active:qs('underline'),run:()=>exec('underline')},
+ {id:'strike',label:'Strikethrough',icon:'<s class="ti-s">S</s>',keys:['Mod','Shift','X'],active:qs('strikeThrough'),run:()=>exec('strikeThrough')},
+ {id:'link',label:'Link',icon:svg('<path d="M6.8 9.2a3 3 0 0 0 4.2 0l2-2a3 3 0 0 0-4.2-4.2l-.9.9M9.2 6.8a3 3 0 0 0-4.2 0l-2 2a3 3 0 0 0 4.2 4.2l.9-.9"/>'),keys:['Mod','K'],active:()=>!!closestIn('a'),run:()=>openLink()},
+ {id:'bulletList',label:'Bulleted list',icon:svg('<path d="M6 4h8M6 8h8M6 12h8"/>'+dot(2.5,4)+dot(2.5,8)+dot(2.5,12)),keys:['Mod','Shift','8'],active:qs('insertUnorderedList'),run:()=>exec('insertUnorderedList')},
+ {id:'orderedList',label:'Numbered list',icon:svg('<path d="M7 4h7M7 8h7M7 12h7M2.5 2.5l1-.5v3.5M2 9.3c.2-.7 1.9-.8 1.9.1 0 .7-1.9 1.4-1.9 2.1h2"/>'),keys:['Mod','Shift','7'],active:qs('insertOrderedList'),run:()=>exec('insertOrderedList')},
+ {id:'quote',label:'Quote',icon:svg('<path d="M3 3v10M6.5 5h7M6.5 8h7M6.5 11h5"/>'),keys:['Mod','Shift','9'],active:()=>blockTag()=='blockquote',run:()=>setBlock('blockquote')},
+ {id:'paragraph',label:'Normal text',icon:'Aa',keys:['Mod','Alt','0'],active:()=>blockTag()=='p',run:()=>{if(blockTag()!='p')exec('formatBlock','<p>')}},
+ {id:'h1',label:'Heading 1',icon:'H1',keys:['Mod','Alt','1'],active:()=>blockTag()=='h1',run:()=>setBlock('h1')},
+ {id:'h2',label:'Heading 2',icon:'H2',keys:['Mod','Alt','2'],active:()=>blockTag()=='h2',run:()=>setBlock('h2')},
+ {id:'alignLeft',label:'Align left',icon:svg('<path d="M2 3h12M2 6.5h8M2 10h12M2 13.5h8"/>'),keys:['Mod','Shift','L'],active:qs('justifyLeft'),run:()=>exec('justifyLeft')},
+ {id:'alignCenter',label:'Center',icon:svg('<path d="M2 3h12M4 6.5h8M2 10h12M4 13.5h8"/>'),keys:['Mod','Shift','E'],active:qs('justifyCenter'),run:()=>exec('justifyCenter')},
+ {id:'alignRight',label:'Align right',icon:svg('<path d="M2 3h12M6 6.5h8M2 10h12M6 13.5h8"/>'),keys:['Mod','Shift','R'],active:qs('justifyRight'),run:()=>exec('justifyRight')},
+ {id:'clear',label:'Clear formatting',icon:svg('<path d="M4 3h9M8.5 3l-3 10M3 13h5M10.5 9.5l4 4M14.5 9.5l-4 4"/>'),keys:['Mod','\\'],run:clearFormat},
+ // Listed in the shortcut help; the browser or the key handler below does the work.
+ {id:'pastePlain',label:'Paste as plain text',keys:['Mod','Shift','V'],help:1},
+ {id:'undo',label:'Undo',keys:['Mod','Z'],help:1},
+ {id:'redo',label:'Redo',keys:['Mod','Shift','Z'],alt:IS_MAC?null:['Ctrl','Y'],help:1},
+ {id:'indent',label:'Indent list item',keys:['Tab'],help:1},
+ {id:'outdent',label:'Outdent list item',keys:['Shift','Tab'],help:1},
+ {id:'toolbar',label:'Move to the toolbar',keys:['Alt','F10'],help:1},
+];
+const CMD=Object.fromEntries(CMDS.map(c=>[c.id,c]));
+const CODE=k=>/^[A-Z]$/.test(k)?'Key'+k:/^\d$/.test(k)?'Digit'+k:k=='\\'?'Backslash':k;
+function matches(e,keys){const mod=keys.includes('Mod');if((IS_MAC?e.metaKey:e.ctrlKey)!==mod||(IS_MAC?e.ctrlKey:e.metaKey))return false;
+ return e.shiftKey===keys.includes('Shift')&&e.altKey===keys.includes('Alt')&&e.code===CODE(keys[keys.length-1])}
+function keyLabel(keys){const m={Mod:IS_MAC?'⌘':'Ctrl',Shift:IS_MAC?'⇧':'Shift',Alt:IS_MAC?'⌥':'Alt',Ctrl:'Ctrl'};const k=keys.map(x=>m[x]||x);return IS_MAC&&keys.length>1&&keys[0]!='Ctrl'?k.join(''):k.join('+')}
+const ariaKeys=keys=>keys.map(k=>k=='Mod'?(IS_MAC?'Meta':'Control'):k=='Ctrl'?'Control':k).join('+');
+
+// Buttons are made from the command list. mousedown is cancelled so the editor keeps focus and selection.
+function makeBtn(c){const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.cmd=c.id;b.innerHTML=c.icon;b.setAttribute('aria-label',c.label);
+ b.title=c.keys?c.label+' ('+keyLabel(c.keys)+')':c.label;if(c.keys)b.setAttribute('aria-keyshortcuts',ariaKeys(c.keys));if(c.active)b.setAttribute('aria-pressed','false');
+ b.onmousedown=e=>e.preventDefault();b.onclick=()=>runCmd(c,b);return b}
+function fillBar(bar,ids){ids.forEach(id=>{if(id=='|'){const s=document.createElement('span');s.className='tsep';s.setAttribute('aria-hidden','true');bar.appendChild(s)}else bar.appendChild(makeBtn(CMD[id]))})}
+// Toolbars are one Tab stop; arrow keys move between buttons. Esc goes back to the text.
+function roving(bar,onEsc){const btns=()=>[...bar.querySelectorAll('.tbtn')].filter(b=>b.offsetParent);
+ bar.querySelectorAll('.tbtn').forEach((b,i)=>b.tabIndex=i?-1:0);
+ bar.addEventListener('keydown',e=>{if(e.key=='Escape'){e.preventDefault();e.stopPropagation();onEsc();return}
+  const bs=btns(),i=bs.indexOf(document.activeElement);if(i<0)return;const j={ArrowRight:(i+1)%bs.length,ArrowLeft:(i-1+bs.length)%bs.length,Home:0,End:bs.length-1}[e.key];
+  if(j==null)return;e.preventDefault();bs.forEach(b=>b.tabIndex=-1);bs[j].tabIndex=0;bs[j].focus()})}
+function runCmd(c,btn){const kb=btn&&document.activeElement===btn;restoreRange();c.run();if(c.id=='link')return;
+ const r=edRange();if(r)lastRange=r.cloneRange();refresh();if(bubbleOn)placeBubble();if(kb)btn.focus({preventScroll:true})}
+
+const fixedBar=$('fixedBar');
+fillBar(fixedBar,['bold','italic','underline','strike','|','link','|','bulletList','orderedList','|','quote','h1','h2','|','alignLeft','alignCenter','alignRight','|','clear']);
+roving(fixedBar,()=>restoreRange());
+
+// Selection ("bubble") toolbar. It lives on <body> with position:fixed so no container can clip it.
+const bubble=el('div','bubble');bubble.hidden=true;
+bubble.innerHTML='<div class="bmain" role="toolbar" aria-label="Format selected text"><div class="bblock"><button type="button" class="tbtn tblock" aria-haspopup="menu" aria-expanded="false" title="Text style"><span>Text</span>'+svg('<path d="M4.5 6.5l3.5 3.5 3.5-3.5"/>')+'</button>'
+ +'<div class="bmenu" role="menu" aria-label="Text style" hidden></div></div><span class="tsep" aria-hidden="true"></span></div>'
+ +'<div class="blink" role="group" aria-label="Link" hidden><input type="text" inputmode="url" aria-label="Link address" placeholder="Paste or type a link" autocomplete="off" spellcheck="false">'
+ +'<button type="button" class="tbtn bapply">Apply</button><button type="button" class="tbtn bremove">Remove</button><span class="berr" role="alert" hidden>Use a web, email or phone link</span></div>';
+document.body.appendChild(bubble);
+const bmain=bubble.querySelector('.bmain'),blockBtn=bubble.querySelector('.tblock'),bmenu=bubble.querySelector('.bmenu'),blinkBox=bubble.querySelector('.blink'),
+ linkInput=blinkBox.querySelector('input'),linkErr=blinkBox.querySelector('.berr'),linkRemove=blinkBox.querySelector('.bremove');
+fillBar(bmain,['bold','italic','underline','strike','|','link','|','bulletList','orderedList','|','clear']);
+['paragraph','h1','h2'].forEach(id=>{const c=CMD[id],b=el('button','bitem',c.label);b.type='button';b.dataset.cmd=id;b.setAttribute('role','menuitemradio');b.setAttribute('aria-checked','false');
+ b.title=c.label+' ('+keyLabel(c.keys)+')';b.onmousedown=e=>e.preventDefault();b.onclick=()=>{closeMenu();runCmd(c,null)};bmenu.appendChild(b)});
+function closeMenu(){bmenu.hidden=true;blockBtn.setAttribute('aria-expanded','false')}
+blockBtn.onmousedown=e=>e.preventDefault();
+blockBtn.onclick=()=>{const open=bmenu.hidden;bmenu.hidden=!open;blockBtn.setAttribute('aria-expanded',open);if(open&&document.activeElement===blockBtn)bmenu.querySelector('[aria-checked=true]')?.focus()};
+bmenu.addEventListener('keydown',e=>{const it=[...bmenu.children],i=it.indexOf(document.activeElement);
+ if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();it[(i+(e.key=='ArrowDown'?1:it.length-1))%it.length].focus()}
+ else if(e.key=='Escape'){e.preventDefault();e.stopPropagation();closeMenu();blockBtn.focus()}});
+roving(bmain,()=>{dismissed=lastRange&&lastRange.cloneRange();hideBubble();restoreRange()});
+
+let bubbleOn=false,dismissed=null,mouseSel=false,composing=false,showT=0;
+const touchOnly=matchMedia('(hover: none) and (pointer: coarse)');
+const sameRange=(a,b)=>a&&b&&a.startContainer===b.startContainer&&a.startOffset===b.startOffset&&a.endContainer===b.endContainer&&a.endOffset===b.endOffset;
+function wantedRange(){if(touchOnly.matches||composing||mouseSel||document.activeElement!==ed)return null;
+ const r=edRange();if(!r||r.collapsed||!r.toString().trim()||dismissed&&sameRange(r,dismissed))return null;return r}
+function updateBubble(){if(!blinkBox.hidden)return;const r=wantedRange();if(!r){if(!bubble.contains(document.activeElement))hideBubble();return}dismissed=null;showBubble(r)}
+function showBubble(r){bubble.hidden=false;bubbleOn=true;refresh();placeBubble(r)}
+function hideBubble(){bubbleOn=false;bubble.classList.remove('show');bubble.hidden=true;closeMenu();blinkBox.hidden=true;bmain.hidden=false}
+// The part of the screen where the editor text can be seen (between the sticky step bar and action bar).
+function visibleArea(){const ui=$('ui').getBoundingClientRect(),st=document.querySelector('.steps'),ac=document.querySelector('.actions');
+ return{top:Math.max(0,ui.top,st?st.getBoundingClientRect().bottom:0),bottom:Math.min(innerHeight,ui.bottom,ac?ac.getBoundingClientRect().top:innerHeight)}}
+function placeBubble(r=edRange()||lastRange){if(!r||bubble.hidden)return;
+ let all=r.getBoundingClientRect(),first=[...r.getClientRects()].find(x=>x.width||x.height)||all;
+ if(!first.width&&!first.height){let n=r.startContainer;if(n.nodeType!==1)n=n.parentNode;first=all=n.getBoundingClientRect()}
+ const vis=visibleArea();
+ // Selection scrolled out of view: hide until it comes back.
+ if(first.bottom<vis.top||first.top>vis.bottom){bubble.classList.remove('show');bubble.style.visibility='hidden';return}
+ bubble.style.visibility='';const w=bubble.offsetWidth,h=bubble.offsetHeight,er=ed.getBoundingClientRect();
+ let top=first.top-h-8;if(top<vis.top)top=all.bottom+8;
+ let lo=Math.max(8,er.left),hi=Math.min(innerWidth-8,er.right)-w;if(hi<lo){lo=8;hi=Math.max(8,innerWidth-8-w)}
+ bubble.style.top=Math.round(top)+'px';bubble.style.left=Math.round(Math.min(Math.max((first.left+first.right)/2-w/2,lo),hi))+'px';
+ bubble.classList.add('show')}
+
+// Active states follow the selection, in both toolbars.
+let refreshQ=0;
+function refresh(){document.querySelectorAll('.tbtn[aria-pressed]').forEach(b=>{const c=CMD[b.dataset.cmd];b.setAttribute('aria-pressed',!!(c&&c.active&&c.active()))});
+ const t=blockTag(),cur={p:'paragraph',h1:'h1',h2:'h2'}[t]||'paragraph';blockBtn.firstChild.textContent=t=='h1'?'Heading 1':t=='h2'?'Heading 2':'Text';
+ bmenu.querySelectorAll('.bitem').forEach(b=>b.setAttribute('aria-checked',b.dataset.cmd==cur))}
+document.addEventListener('selectionchange',()=>{const r=edRange();if(r)lastRange=r.cloneRange();if(bubble.contains(document.activeElement))return;
+ if(r&&!refreshQ)refreshQ=requestAnimationFrame(()=>{refreshQ=0;refresh()});
+ // Follow the selection right away while the toolbar is open (Shift+Arrow); otherwise wait for it to settle.
+ clearTimeout(showT);if(bubbleOn)requestAnimationFrame(updateBubble);else showT=setTimeout(updateBubble,120)});
+ed.addEventListener('mousedown',()=>{mouseSel=true;ruleUndo=0;hideBubble()});
+document.addEventListener('mouseup',()=>{if(!mouseSel)return;mouseSel=false;clearTimeout(showT);showT=setTimeout(updateBubble,120)});
+ed.addEventListener('focusout',e=>{if(!bubble.contains(e.relatedTarget))hideBubble()});
+bubble.addEventListener('focusout',e=>{if(e.relatedTarget!==ed&&!bubble.contains(e.relatedTarget))hideBubble()});
+ed.addEventListener('compositionstart',()=>{composing=true;hideBubble()});
+ed.addEventListener('compositionend',()=>{composing=false});
+document.addEventListener('scroll',()=>{if(bubbleOn)placeBubble()},true);
+addEventListener('resize',()=>{if(bubbleOn)placeBubble()});
+
+// Links: only web, email and phone links; a bare domain gets https://.
+function normalizeUrl(v){let s=String(v||'').trim();if(!s)return null;
+ if(/^[\w.+-]+@[\w-]+(\.[\w-]+)+$/.test(s))s='mailto:'+s;
+ else if(/^\+?\d[\d\s().-]{5,}$/.test(s))s='tel:'+s.replace(/[^\d+]/g,'');
+ else if(s.startsWith('//'))s='https:'+s;
+ else if(!/^[a-z][a-z\d+.-]*:/i.test(s)||/^[^\/:]+\.[^\/:]+:\d/.test(s))s='https://'+s;
+ let u;try{u=new URL(s)}catch(e){return null}
+ if(u.protocol=='http:'||u.protocol=='https:')return u.hostname.includes('.')||u.hostname=='localhost'?u.href:null;
+ if(u.protocol=='mailto:')return /^mailto:[^@\s]+@[^@\s]+\.[^@\s]+$/i.test(s)?s:null;
+ if(u.protocol=='tel:')return /^tel:\+?[\d().-]{3,}$/i.test(s)?s:null;
+ return null}
+function openLink(){let r=edRange()||lastRange;if(!r)return;const a=closestIn('a');if(a&&r.collapsed){selectNode(a);r=lastRange}lastRange=r.cloneRange();
+ linkInput.value=a?a.getAttribute('href')||'':'';linkErr.hidden=true;linkInput.removeAttribute('aria-invalid');linkRemove.hidden=!a;
+ dismissed=null;bmain.hidden=true;blinkBox.hidden=false;closeMenu();bubble.hidden=false;bubbleOn=true;placeBubble(r);linkInput.focus();linkInput.select()}
+function closeLink(){blinkBox.hidden=true;bmain.hidden=false;restoreRange();const r=edRange();if(r&&!r.collapsed&&!touchOnly.matches){refresh();placeBubble(r)}else hideBubble()}
+function applyLink(){const url=normalizeUrl(linkInput.value);if(!url){linkErr.hidden=false;linkInput.setAttribute('aria-invalid','true');return}
+ restoreRange();const r=edRange();if(r&&r.collapsed)exec('insertHTML','<a href="'+esc(url)+'">'+esc(url)+'</a>');else exec('createLink',url);closeLink()}
+function removeLink(){restoreRange();const a=closestIn('a');if(a&&edRange().collapsed)selectNode(a);exec('unlink');closeLink()}
+blinkBox.querySelector('.bapply').onclick=applyLink;linkRemove.onclick=removeLink;
+linkInput.addEventListener('keydown',e=>{if(e.key=='Enter'){e.preventDefault();applyLink()}else if(e.key=='Escape'){e.preventDefault();e.stopPropagation();closeLink()}});
+linkInput.addEventListener('input',()=>{linkErr.hidden=true;linkInput.removeAttribute('aria-invalid')});
+
+// Keyboard shortcuts: only while the editor has focus, so other fields keep their own shortcuts.
+let ruleUndo=0,plainNext=false;
+function focusToolbar(){const r=edRange();if(r&&!r.collapsed&&!touchOnly.matches){dismissed=null;showBubble(r);(bmain.querySelector('.tbtn[tabindex="0"]')||bmain.querySelector('.tbtn')).focus()}
+ else (fixedBar.querySelector('.tbtn[tabindex="0"]')||fixedBar.querySelector('.tbtn')).focus()}
+ed.addEventListener('keydown',e=>{
+ if(e.isComposing||e.keyCode===229)return;
+ // Backspace right after a Markdown shortcut turned into formatting puts the typed characters back.
+ if(ruleUndo&&e.key=='Backspace'&&!e.shiftKey&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();for(let i=0;i<ruleUndo;i++)exec('undo');ruleUndo=0;return}
+ ruleUndo=0;
+ if(e.key=='Escape'&&bubbleOn){e.preventDefault();dismissed=edRange()?.cloneRange();hideBubble();return}
+ if(e.key=='Tab'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&closestIn('li')){e.preventDefault();exec(e.shiftKey?'outdent':'indent');return}
+ if(e.key=='F10'&&e.altKey&&!e.ctrlKey&&!e.metaKey||matches(e,['Mod','Alt','T'])){e.preventDefault();focusToolbar();return}
+ if(!IS_MAC&&e.ctrlKey&&!e.shiftKey&&!e.altKey&&e.code=='KeyY'){e.preventDefault();exec('redo');return}
+ if(matches(e,['Mod','Shift','V'])){plainNext=true;setTimeout(plainFallback,100);return}
+ const c=CMDS.find(c=>c.run&&matches(e,c.keys));if(c){e.preventDefault();runCmd(c,null)}});
+
+// Paste: keep supported formatting, drop the rest. Mod+Shift+V pastes plain text.
+function insertPlain(t){if(t)exec('insertText',t.replace(/\r\n?/g,'\n'))}
+function plainFallback(){if(!plainNext)return;plainNext=false;const p=navigator.clipboard?.readText?.();
+ const fail=()=>toast('This browser blocked paste as plain text. Paste normally, then use Clear formatting.');
+ if(!p){fail();return}p.then(t=>{restoreRange();insertPlain(t)},fail)}
+ed.addEventListener('paste',e=>{const dt=e.clipboardData;if(!dt)return;e.preventDefault();const html=dt.getData('text/html'),text=dt.getData('text/plain');
+ if(plainNext||!html){plainNext=false;insertPlain(text)}else if(!exec('insertHTML',cleanHTML(html)))insertPlain(text)});
+
+// Markdown-style shortcuts: **bold**, *italic*, _italic_, "- " or "* " list, "1. " numbered list, "> " quote.
+ed.addEventListener('input',e=>{if(e.inputType!=='insertText'||e.isComposing||composing)return;const d=e.data;if(d!==' '&&d!=='*'&&d!=='_')return;
+ const r=edRange();if(!r||!r.collapsed||r.startContainer.nodeType!==3)return;const n=r.startContainer,off=r.startOffset;
+ if(d===' '){const blk=closestIn('p,li,h1,h2,blockquote,div')||ed,pre=document.createRange();pre.setStart(blk,0);pre.setEnd(n,off);
+  const line=pre.toString().replace(/\u00a0/g,' '),rule={'- ':'insertUnorderedList','* ':'insertUnorderedList','1. ':'insertOrderedList','> ':'quote'}[line];
+  if(!rule||off<line.length||closestIn('li')||rule=='quote'&&blockTag()=='blockquote')return;
+  selectText(n,off-line.length,off);exec('delete');if(rule=='quote')exec('formatBlock','<blockquote>');else exec(rule);ruleUndo=2;return}
+ const t=n.data.slice(0,off).replace(/\u00a0/g,' ');let m,tag;
+ if(d==='*'&&(m=t.match(/\*\*([^*\s](?:[^*]*[^*\s])?)\*\*$/)))tag='strong';
+ else if(d==='*'&&(m=t.match(/(?:^|[^*\w])\*([^*\s](?:[^*]*[^*\s])?)\*$/)))tag='em';
+ else if(d==='_'&&(m=t.match(/(?:^|[^_\w])_([^_\s](?:[^_]*[^_\s])?)_$/)))tag='em';
+ if(!tag)return;const inner=m[1];selectText(n,off-inner.length-(tag=='strong'?4:2),off);
+ exec('insertHTML','<'+tag+'>'+esc(inner)+'</'+tag+'>');const st=tag=='strong'?'bold':'italic';if(document.queryCommandState(st))exec(st);ruleUndo=1});
+
+// Shortcut help, made from the same command list.
+$('kbdList').innerHTML=CMDS.filter(c=>c.keys).map(c=>'<dt>'+esc(c.label)+'</dt><dd><kbd>'+esc(keyLabel(c.keys))+'</kbd>'+(c.alt?' or <kbd>'+esc(keyLabel(c.alt))+'</kbd>':'')+'</dd>').join('')
+ +'<dt>Hide the selection toolbar</dt><dd><kbd>Esc</kbd></dd>';
+
+// Clean HTML for the editor, saved templates and the letter: only <p> <br> <strong> <em> <u> <s> <a> <ul> <ol> <li>
+// <blockquote> <h1> <h2>, plus text alignment. Used for pasted content (Word, Google Docs, web pages) too.
+const BLOCKS=new Set(['P','DIV','UL','OL','LI','H1','H2','H3','H4','H5','H6','BLOCKQUOTE','TABLE','TBODY','THEAD','TFOOT','TR','TD','TH','SECTION','ARTICLE','HEADER','FOOTER','PRE','FIGURE','DL','DT','DD']);
+const DROP=new Set(['SCRIPT','STYLE','META','LINK','TITLE','HEAD','IFRAME','FRAME','OBJECT','EMBED','SVG','MATH','TEMPLATE','NOSCRIPT','BUTTON','INPUT','SELECT','TEXTAREA','IMG','PICTURE','VIDEO','AUDIO','CANVAS','FORM']);
+const INLINE={B:'strong',STRONG:'strong',I:'em',EM:'em',CITE:'em',U:'u',INS:'u',S:'s',STRIKE:'s',DEL:'s'};
+function cleanHTML(html){const doc=new DOMParser().parseFromString(String(html??''),'text/html'),out=document.createElement('div');cleanInto(doc.body,out,out);return out.innerHTML}
+const hasBlock=n=>[...n.querySelectorAll('*')].some(x=>BLOCKS.has(x.tagName));
+function styleWraps(n){const s=n.style,o=[];if(!s)return o;const w=s.fontWeight,d=(s.textDecorationLine||s.textDecoration||'');
+ if(w=='bold'||w=='bolder'||+w>=600)o.push('strong');if(s.fontStyle=='italic')o.push('em');if(/underline/.test(d))o.push('u');if(/line-through/.test(d))o.push('s');return o}
+function nest(dst,tags){let x=dst;tags.forEach(t=>{const y=document.createElement(t);x.appendChild(y);x=y});return x}
+function cleanInto(src,dst,root){for(const n of src.childNodes){
+ if(n.nodeType===3){const t=n.data.replace(/[\r\n\t]+/g,' ');if(!t||!t.trim()&&(dst===root||/^(UL|OL)$/.test(dst.tagName)))continue;dst.appendChild(document.createTextNode(t));continue}
+ if(n.nodeType!==1||DROP.has(n.tagName))continue;const tag=n.tagName;
+ if(tag=='BR'){dst.appendChild(document.createElement('br'));continue}
+ const li=tag=='LI'&&/^(UL|OL)$/.test(dst.tagName);
+ if(tag=='UL'||tag=='OL'||li||tag=='BLOCKQUOTE'){const b=document.createElement(tag.toLowerCase());if(tag=='OL'&&+n.getAttribute('start')>1)b.setAttribute('start',n.getAttribute('start'));
+  setAlign(n,b);cleanInto(n,nest(b,li?styleWraps(n):[]),root);dst.appendChild(b);continue}
+ // A list item outside a list is treated as a paragraph.
+ if(tag=='P'||tag=='DIV'||tag=='LI'||/^H[1-6]$/.test(tag)){
+  if(hasBlock(n)||dst.tagName=='LI'||(tag=='P'||tag=='DIV')&&/^(P|H1|H2)$/.test(dst.tagName)){cleanInto(n,dst,root);continue}
+  const b=document.createElement(tag=='H1'?'h1':/^H/.test(tag)?'h2':'p');setAlign(n,b);
+  cleanInto(n,nest(b,styleWraps(n).filter(w=>!(w=='strong'&&/^h/.test(b.tagName.toLowerCase())))),root);dst.appendChild(b);continue}
+ if(tag=='A'){const u=normalizeUrl(n.getAttribute('href'));if(!u||hasBlock(n)){cleanInto(n,dst,root);continue}
+  const a=document.createElement('a');a.setAttribute('href',u);a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');cleanInto(n,a,root);if(a.textContent)dst.appendChild(a);continue}
+ // Inline wrappers around whole paragraphs (e.g. Google Docs' outer <b>) and unknown tags are unwrapped.
+ if(hasBlock(n)){cleanInto(n,dst,root);continue}
+ const w=[],fw=n.style&&n.style.fontWeight;if(INLINE[tag]&&!(INLINE[tag]=='strong'&&(fw=='normal'||+fw&&+fw<600)))w.push(INLINE[tag]);
+ styleWraps(n).forEach(x=>{if(!w.includes(x))w.push(x)});if(!w.length){cleanInto(n,dst,root);continue}
+ const top=document.createElement(w[0]);cleanInto(n,nest(top,w.slice(1)),root);if(top.textContent||top.querySelector('br'))dst.appendChild(top)}}
+function setAlign(n,b){const a=(n.style&&n.style.textAlign)||n.getAttribute('align')||'';if(/^(left|center|right|justify)$/i.test(a))b.style.textAlign=a.toLowerCase()}
+$('save').onclick=()=>{try{localStorage.setItem(tplKey(),JSON.stringify({subject:$('subj').value,body:cleanHTML($('body').innerHTML)}));custom=true;tplNote('Template saved for '+P[party].n+' ✓')}catch(e){tplNote('Could not save in this browser.',true)}};
 $('reset').onclick=()=>{try{localStorage.removeItem(tplKey())}catch(e){}custom=false;load();draw()};
 let pdfLibrariesPromise;
 function loadPdfLibraries(){
