@@ -11,7 +11,7 @@ window.LETTER_SIGNATORIES = {
     { en: 'Santhana Pachsong', th:'สรรธณ เพชรสงค์'}
   ],
   positions: [
-    { en: 'President of the SPIP Hack 2027 Organising Committee', th: 'ประธานคนะผู้จัดงาน SPIP Hack 2027' },   // example
-    { en: 'Head of Public Relations, SPIP Hack 2027 Organising Committee', th: 'หัวหน้าฝ่ายประชาสัมพันธ์และสื่อสารองค์กร, คนะผู้จัดงาน SPIP Hack 2027' },   // example
+    { en: 'President of the SPIP Hack 2027 Organising Committee', th: 'ประธานคณะผู้จัดงาน SPIP Hack 2027' },   // example
+    { en: 'Head of Public Relations, SPIP Hack 2027 Organising Committee', th: 'หัวหน้าฝ่ายประชาสัมพันธ์และสื่อสารองค์กร, คณะผู้จัดงาน SPIP Hack 2027' },   // example
   ],
 };
