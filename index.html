@@ -225,13 +225,13 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 </section>
 <section class="card" id="secSig" aria-labelledby="sigH">
 <h2 id="sigH"><span class="n">3</span>Signatures</h2>
-<div class="two"><div><label for="s1nSel">Signatory name</label><select id="s1nSel" data-pick="names" data-for="s1n"></select></div><div><label for="s1pSel">Position</label><select id="s1pSel" data-pick="positions" data-for="s1p"></select></div></div>
-<div id="s1nOther" hidden><div class="two"><div data-l="en"><label for="s1nEn">Name (English)</label><input id="s1nEn" placeholder="e.g. Nicha Srisuk"></div><div data-l="th"><label for="s1nTh">Name (Thai)</label><input id="s1nTh" class="th" placeholder="เช่น ณิชา ศรีสุข"></div></div></div>
-<div id="s1pOther" hidden><div class="two"><div data-l="en"><label for="s1p">Position (English)</label><input id="s1p" placeholder="e.g. Head of Partnerships, SPIP Hack 2027"></div><div data-l="th"><label for="s1pTh">Position (Thai)</label><input id="s1pTh" class="th" placeholder="เช่น หัวหน้าฝ่ายพันธมิตร"></div></div></div>
+<label for="s1Sel">Signatory</label><select id="s1Sel" data-pick="s1"></select>
+<div id="s1Other" hidden><div class="two"><div data-l="en"><label for="s1nEn">Name (English)</label><input id="s1nEn" placeholder="e.g. Nicha Srisuk"></div><div data-l="th"><label for="s1nTh">Name (Thai)</label><input id="s1nTh" class="th" placeholder="เช่น ณิชา ศรีสุข"></div></div>
+<div class="two"><div data-l="en"><label for="s1p">Position (English)</label><input id="s1p" placeholder="e.g. Head of Partnerships, SPIP Hack 2027"></div><div data-l="th"><label for="s1pTh">Position (Thai)</label><input id="s1pTh" class="th" placeholder="เช่น หัวหน้าฝ่ายพันธมิตร"></div></div></div>
 <label class="chk"><input type="checkbox" id="s2on"><span>Add a second signatory (e.g. supervising teacher)</span></label>
-<div id="s2box" style="display:none"><div class="two"><div><label for="s2nSel">Second signatory</label><select id="s2nSel" data-pick="names" data-for="s2n"></select></div><div><label for="s2pSel">Position</label><select id="s2pSel" data-pick="positions" data-for="s2p"></select></div></div>
-<div id="s2nOther" hidden><div class="two"><div data-l="en"><label for="s2nEn">Name (English)</label><input id="s2nEn"></div><div data-l="th"><label for="s2nTh">Name (Thai)</label><input id="s2nTh" class="th"></div></div></div>
-<div id="s2pOther" hidden><div class="two"><div data-l="en"><label for="s2p">Position (English)</label><input id="s2p"></div><div data-l="th"><label for="s2pTh">Position (Thai)</label><input id="s2pTh" class="th"></div></div></div></div>
+<div id="s2box" style="display:none"><label for="s2Sel">Second signatory</label><select id="s2Sel" data-pick="s2"></select>
+<div id="s2Other" hidden><div class="two"><div data-l="en"><label for="s2nEn">Name (English)</label><input id="s2nEn"></div><div data-l="th"><label for="s2nTh">Name (Thai)</label><input id="s2nTh" class="th"></div></div>
+<div class="two"><div data-l="en"><label for="s2p">Position (English)</label><input id="s2p"></div><div data-l="th"><label for="s2pTh">Position (Thai)</label><input id="s2pTh" class="th"></div></div></div></div>
 <label class="chk"><input type="checkbox" id="stamp"><span>Leave an area for the school stamp</span></label>
 <small class="mini">Signatory details are remembered on this device. <button type="button" class="link" id="sigClear">Forget and clear</button></small>
 </section>
@@ -832,20 +832,21 @@ const SIG=['s1nEn','s1nTh','s1p','s1pTh','s2on','s2nEn','s2nTh','s2p','s2pTh'],S
 try{const m=JSON.parse(localStorage.getItem(SIGK)||'null');if(m){SIG.forEach(i=>{if(m[i]==null)return;if($(i).type=='checkbox')$(i).checked=!!m[i];else $(i).value=m[i]});$('s2box').style.display=$('s2on').checked?'block':'none'}}catch(e){}
 function saveSig(){try{const m={};SIG.forEach(i=>m[i]=$(i).type=='checkbox'?$(i).checked:$(i).value);localStorage.setItem(SIGK,JSON.stringify(m))}catch(e){}}
 SIG.forEach(i=>$(i).addEventListener('input',saveSig));
-// Signatory dropdowns: the lists come from signatories.js. Picking an entry fills the English and Thai
-// fields; "Other" shows the fields so a name or position can be typed in.
-const SIGLIST=window.LETTER_SIGNATORIES||{},PICKS=[...document.querySelectorAll('select[data-pick]')];
-const pickList=s=>(SIGLIST[s.dataset.pick]||[]).filter(x=>x&&(x.en||x.th));
-const pickFields=s=>{const f=s.dataset.for;return f.endsWith('n')?[f+'En',f+'Th']:[f,f+'Th']};
-PICKS.forEach(s=>{const list=pickList(s);
- s.innerHTML='<option value="">'+(s.dataset.pick=='names'?'Choose a name…':'Choose a position…')+'</option>'
-  +list.map((x,i)=>'<option value="'+i+'">'+esc(x.en&&x.th?x.en+' · '+x.th:x.en||x.th)+'</option>').join('')+'<option value="other">Other (type it in)</option>';
- s.addEventListener('change',()=>{const [en,th]=pickFields(s),v=s.value;
-  if(v!=='other'){const x=list[+v]||{};$(en).value=v?x.en||'':'';$(th).value=v?x.th||'':''}
-  $(s.dataset.for+'Other').hidden=v!=='other';$(en).dispatchEvent(new Event('input'))})});
+// Signatory dropdowns: the list comes from signatories.js. Picking a person fills their name and
+// position in English and Thai; "Other" shows the fields so someone can be typed in.
+const SIGLIST=(window.LETTER_SIGNATORIES||{}).people||[],PICKS=[...document.querySelectorAll('select[data-pick]')];
+const people=SIGLIST.filter(x=>x&&(x.nameEn||x.nameTh));
+const SIGF=['nameEn','nameTh','positionEn','positionTh'];
+const pickFields=s=>{const f=s.dataset.pick;return [f+'nEn',f+'nTh',f+'p',f+'pTh']};
+const pickLabel=x=>{const n=x.nameEn&&x.nameTh?x.nameEn+' · '+x.nameTh:x.nameEn||x.nameTh,p=x.positionEn||x.positionTh;return p?n+' — '+p:n};
+PICKS.forEach(s=>{
+ s.innerHTML='<option value="">Choose a person…</option>'+people.map((x,i)=>'<option value="'+i+'">'+esc(pickLabel(x))+'</option>').join('')+'<option value="other">Other (type it in)</option>';
+ s.addEventListener('change',()=>{const ids=pickFields(s),v=s.value;
+  if(v!=='other'){const x=people[+v]||{};ids.forEach((id,k)=>$(id).value=v?(x[SIGF[k]]||'').trim():'')}
+  $(s.dataset.pick+'Other').hidden=v!=='other';ids.forEach(id=>$(id).dispatchEvent(new Event('input')))})});
 // Show the dropdowns matching the current fields (e.g. a signatory remembered on this device).
-function syncPicks(){PICKS.forEach(s=>{const [en,th]=pickFields(s),e=$(en).value.trim(),t=$(th).value.trim(),i=pickList(s).findIndex(x=>(x.en||'')==e&&(x.th||'')==t);
- s.value=i>=0?String(i):e||t?'other':'';$(s.dataset.for+'Other').hidden=s.value!=='other'})}
+function syncPicks(){PICKS.forEach(s=>{const vals=pickFields(s).map(id=>$(id).value.trim()),i=people.findIndex(x=>SIGF.every((f,k)=>(x[f]||'').trim()==vals[k]));
+ s.value=i>=0?String(i):vals.some(Boolean)?'other':'';$(s.dataset.pick+'Other').hidden=s.value!=='other'})}
 syncPicks();
 $('sigClear').onclick=()=>{try{localStorage.removeItem(SIGK)}catch(e){}SIG.forEach(i=>{if($(i).type=='checkbox')$(i).checked=false;else $(i).value=''});$('s2box').style.display='none';syncPicks();draw();toast('Saved signatory forgotten')};
 // Step indicator: scroll to a section, and highlight the one in view.
@@ -875,7 +876,7 @@ try{const w=+localStorage.getItem(UIW_KEY);if(w)setUiw(w,false)}catch(e){}
 addEventListener('resize',()=>{if(document.body.style.getPropertyValue('--uiw')&&uiw()>uiwMax())setUiw(uiwMax(),false);syncSplit()});
 syncSplit();
 // App version: V1.{pull request number}.
-const APP_VERSION='V1.6';$('appVersion').textContent=APP_VERSION;
+const APP_VERSION='V1.7';$('appVersion').textContent=APP_VERSION;
 </script></body></html>
 
 
