@@ -155,9 +155,8 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 .sheet .logo{margin:0 0 2mm;text-align:center;line-height:0}.sheet .logo img{width:85mm;max-width:100%;height:auto;display:block;margin:0 auto}
 .meta{display:flex;justify-content:space-between;margin-top:8mm;font-size:10.5pt}
 .rcpt{margin-top:7mm;white-space:pre-line}.subj{margin:7mm 0 4mm;font-weight:700;line-height:1.45}.body{overflow-wrap:anywhere}.body p{margin:0 0 4mm;text-align:left}
-.body p{margin:0 0 3.2mm;text-align:justify}
-/* Thai has few spaces, so justifying it stretches those few into wide gaps: keep Thai left-aligned. */
-.th .body p{text-align:left}.enc{font-size:10.5pt;margin-top:3mm}
+.body p{margin:0 0 3.2mm;text-align:left}
+.enc{font-size:10.5pt;margin-top:3mm}
 .sign{margin-top:auto;padding-top:10mm}.sign .row{display:flex;gap:16mm;margin-top:3mm}.sign .col{flex:1}
 .sign .space{height:22mm;border-bottom:1px solid #000;margin-top:2mm}.sign .lab{font-size:9.5pt;color:#444}.sign .name-en{font-family:Arial,Helvetica,sans-serif}.sign .name-th{font-family:'TH Sarabun New',Sarabun,Thonburi,Tahoma,'Noto Sans Thai',sans-serif}
 .stamp{width:30mm;height:30mm;border:1px dashed #888;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8pt;color:#888;margin-top:4mm;text-align:center}
@@ -876,7 +875,7 @@ try{const w=+localStorage.getItem(UIW_KEY);if(w)setUiw(w,false)}catch(e){}
 addEventListener('resize',()=>{if(document.body.style.getPropertyValue('--uiw')&&uiw()>uiwMax())setUiw(uiwMax(),false);syncSplit()});
 syncSplit();
 // App version: V1.{pull request number}.
-const APP_VERSION='V1.5';$('appVersion').textContent=APP_VERSION;
+const APP_VERSION='V1.6';$('appVersion').textContent=APP_VERSION;
 </script></body></html>
 
 
