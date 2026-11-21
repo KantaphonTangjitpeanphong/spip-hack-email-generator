@@ -154,7 +154,7 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 .sheet{width:210mm;height:297mm;overflow:hidden;margin:0 auto;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.18);padding:10mm 23mm 17mm;display:flex;flex-direction:column;font-size:11.5pt;line-height:1.58;color:#000}
 .sheet .logo{margin:0 0 2mm;text-align:center;line-height:0}.sheet .logo img{width:85mm;max-width:100%;height:auto;display:block;margin:0 auto}
 .meta{display:flex;justify-content:space-between;margin-top:8mm;font-size:10.5pt}
-.rcpt{margin-top:7mm;white-space:pre-line}.subj{margin:7mm 0 4mm;font-weight:700;line-height:1.45}.body{overflow-wrap:anywhere}.body p{margin:0 0 4mm;text-align:left}
+.rcpt{margin-top:7mm;white-space:pre-line}.subj{margin:7mm 0 4mm;font-weight:700;line-height:1.45}.subj.subj-first{margin:7mm 0 0}.rcpt.rcpt-after{margin:5mm 0 4mm}.body{overflow-wrap:anywhere}.body p{margin:0 0 4mm;text-align:left}
 .body p{margin:0 0 3.2mm;text-align:left}
 .enc{font-size:10.5pt;margin-top:3mm}
 .sign{margin-top:auto;padding-top:10mm}.sign .row{display:flex;gap:16mm;margin-top:3mm}.sign .col{flex:1}
@@ -197,6 +197,7 @@ button.link{border:0;background:none;padding:0;font:inherit;color:var(--purple);
 <section class="card" id="secRcpt" aria-labelledby="rcptH">
 <h2 id="rcptH"><span class="n">1</span>Recipient</h2>
 <label for="addresseeMode">Addressing style</label><select id="addresseeMode"><option value="named">Named recipient</option><option value="generic">To Whom It May Concern</option><option value="team">Team / Department</option></select>
+<div id="rcptPosField"><label for="rcptPos">Recipient position</label><select id="rcptPos"><option value="above">Above subject</option><option value="below">Below subject</option></select></div>
 <div id="namedFields">
 <div class="name-row"><div><label for="sal">Title</label><select id="sal"><option>Mr.</option><option>Ms.</option><option>Mrs.</option><option>Dr.</option><option>Prof.</option><option>Assoc. Prof.</option><option>Khun</option><option>คุณ</option><option>ดร.</option><option>ศ.</option><option>รศ.</option><option>ผศ.</option><option>ท่าน</option><option></option></select></div>
 <div data-l="en"><label for="nameEn">Full name (English)</label><input id="nameEn" placeholder="e.g. Somchai Wongsakul" autocomplete="off" required></div>
@@ -375,6 +376,7 @@ function rolesUI(){const r=roles[party]||[];$('roles').innerHTML=r.length?'<h2 s
 r.forEach(([k,l])=>{const d=document.createElement('div');d.className='chk';d.innerHTML='<input type="checkbox" '+(R[k]?'checked':'')+'><span>'+l+'</span>';d.firstChild.onchange=e=>{R[k]=e.target.checked;if(!custom){const o=gen(editLang());$('subj').value=o.subject;$('body').innerHTML=editorHTML(o.body)}draw()};$('roles').appendChild(d)})}
 function pick(k){party=k;for(const l in drafts)delete drafts[l];document.querySelectorAll('.party').forEach(b=>b.classList.toggle('on',b.dataset.k==k));$('positionEn').placeholder=P[k].pos;$('orgEn').placeholder=P[k].org;setEnc();
 $('sponNote').style.display='none';load();rolesUI();draw()}
+function syncRcptFields(){const m=$('addresseeMode').value;$('namedFields').style.display=m==='named'?'block':'none';$('rcptPosField').style.display=m==='team'?'block':'none'}
 function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function thDate(v){const f=new Intl.DateTimeFormat('th-TH-u-ca-buddhist',{day:'numeric',month:'long',year:'numeric'}).formatToParts(new Date(v+'T00:00')),g=t=>(f.find(p=>p.type==t)||{}).value;return g('day')+' '+g('month')+' พ.ศ. '+g('year')}
 function paras(t,language){
@@ -473,9 +475,11 @@ const lg=el('div','logo');const im=el('img');im.src=LOGO;if(logoProbe.naturalWid
 const v=$('date').value,nm=$('addresseeMode').value==='named'?fullName(language):'',position=localized('positionEn','positionTh',language),org=localized('orgEn','orgTh',language),address=localized('addrEn','addrTh',language);
 const d=v?(th?thDate(v):new Date(v+'T00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})):'';
 const m=el('div','meta');m.appendChild(el('span',null,$('ref').value.trim()?t.ref+$('ref').value.trim():''));m.appendChild(el('span',null,d));B.push(m);
-B.push(el('div','rcpt',[nm,position,org,address].filter(Boolean).join('\n')));
-B.push(el('div','subj',t.subj+fill(subject,language)));
-const mode=$('addresseeMode').value;const salutation=mode==='generic'?(th?'เรียน ผู้เกี่ยวข้อง':'To Whom It May Concern:'):mode==='team'?(th?'เรียน ฝ่ายที่เกี่ยวข้อง':'Dear Partnerships Team,'):t.dear+(nm||[position,org].filter(Boolean).join(' ')||t.fb)+t.dearEnd;const sp=el('p',null,salutation);sp.style.margin='0 0 3.2mm';B.push(sp);
+const mode=$('addresseeMode').value;const rcText=[nm,position,org,address].filter(Boolean).join('\n');
+// Team / Department letters can put the recipient block below the subject; an empty block is skipped so no gap is left.
+const below=mode==='team'&&$('rcptPos').value==='below'&&rcText,rc=el('div','rcpt',rcText),sj=el('div','subj',t.subj+fill(subject,language));
+if(below){sj.classList.add('subj-first');rc.classList.add('rcpt-after');B.push(sj,rc)}else B.push(rc,sj);
+const salutation=mode==='generic'?(th?'เรียน ผู้เกี่ยวข้อง':'To Whom It May Concern:'):mode==='team'?(th?'เรียน ฝ่ายที่เกี่ยวข้อง':'Dear Partnerships Team,'):t.dear+(nm||[position,org].filter(Boolean).join(' ')||t.fb)+t.dearEnd;const sp=el('p',null,salutation);sp.style.margin='0 0 3.2mm';B.push(sp);
 B.push(...paras(body,language));
 if(enc)B.push(el('div','enc',t.enc+enc));
 const g=el('div','sign');g.appendChild(el('div',null,t.close));const rw=el('div','row');
@@ -487,7 +491,7 @@ const dl=el('div',null,t.date);dl.style.marginTop='4mm';c.appendChild(dl);rw.app
 g.appendChild(rw);if($('stamp').checked)g.appendChild(el('div','stamp',t.stamp));B.push(g);
 paginate(B,th?'th':'en','SPIP Hack 2027 · '+(th?VENUE_TH:VENUE_EN)+' · hackathon@spip.in.th')}
 Object.keys(P).forEach(k=>{const b=el('button','party');b.dataset.k=k;b.innerHTML=P[k].n+'<small>'+P[k].d+'</small>';b.onclick=()=>pick(k);$('parties').appendChild(b)});
-['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s1pTh','s2nEn','s2nTh','s2p','s2pTh','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode'].forEach(i=>$(i).addEventListener(i==='addresseeMode'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){bothEdit='en';for(const l in drafts)delete drafts[l];setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')$('namedFields').style.display=$('addresseeMode').value==='named'?'block':'none';draw()}));
+['sal','nameEn','nameTh','positionEn','positionTh','orgEn','orgTh','addrEn','addrTh','date','ref','reply','enc','s1nEn','s1nTh','s1p','s1pTh','s2nEn','s2nTh','s2p','s2pTh','subj','stamp','s2on','body','lay','wm','wmo','addresseeMode','rcptPos'].forEach(i=>$(i).addEventListener(i==='addresseeMode'||i==='rcptPos'?'change':'input',()=>{if(i=='body'||i=='subj')custom=true;if(i=='lay'){bothEdit='en';for(const l in drafts)delete drafts[l];setEnc();load()}if(i=='s2on')$('s2box').style.display=$('s2on').checked?'block':'none';if(i=='addresseeMode')syncRcptFields();if(i=='rcptPos')try{localStorage.setItem('rcpt_pos',$('rcptPos').value)}catch(e){}draw()}));
 // ---- Body editor. One command list (CMDS) drives the keyboard shortcuts, the fixed toolbar,
 // the selection toolbar and the shortcut help, so they always do the same thing. ----
 const ed=$('body'),IS_MAC=/Mac|iPhone|iPad|iPod/i.test(navigator.userAgentData?.platform||navigator.platform||navigator.userAgent);
@@ -867,7 +871,7 @@ function markStep(i){steps.forEach((a,j)=>{a.classList.toggle('on',j==i);if(j==i
 if(window.IntersectionObserver){const io=new IntersectionObserver(es=>{es.forEach(e=>seen[e.target.id]=e.isIntersecting);const i=steps.findIndex(a=>seen[a.dataset.s]);if(i>=0||seen.secStart)markStep(i)},{rootMargin:'-90px 0px -50% 0px'});
 ['secStart',...steps.map(a=>a.dataset.s)].forEach(id=>io.observe($(id)))}
 $('pvJump').onclick=()=>$('pv').scrollIntoView({behavior:'smooth',block:'start'});
-$('date').value=new Date().toISOString().slice(0,10);$('namedFields').style.display='block';pick('schools');
+$('date').value=new Date().toISOString().slice(0,10);try{const rp=localStorage.getItem('rcpt_pos');if(rp==='above'||rp==='below')$('rcptPos').value=rp}catch(e){}syncRcptFields();pick('schools');
 booted=true;syncLang();updBadge();detSum();
 // Web fonts (e.g. Sarabun for Thai) change line widths, so lay out the pages again when they finish loading.
 document.fonts?.addEventListener?.('loadingdone',()=>draw());
@@ -887,7 +891,7 @@ try{const w=+localStorage.getItem(UIW_KEY);if(w)setUiw(w,false)}catch(e){}
 addEventListener('resize',()=>{if(document.body.style.getPropertyValue('--uiw')&&uiw()>uiwMax())setUiw(uiwMax(),false);syncSplit()});
 syncSplit();
 // App version: V1.{pull request number}.
-const APP_VERSION='V1.7';$('appVersion').textContent=APP_VERSION;
+const APP_VERSION='V1.8';$('appVersion').textContent=APP_VERSION;
 </script></body></html>
 
 
