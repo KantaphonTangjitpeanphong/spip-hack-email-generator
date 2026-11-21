@@ -475,11 +475,13 @@ const lg=el('div','logo');const im=el('img');im.src=LOGO;if(logoProbe.naturalWid
 const v=$('date').value,nm=$('addresseeMode').value==='named'?fullName(language):'',position=localized('positionEn','positionTh',language),org=localized('orgEn','orgTh',language),address=localized('addrEn','addrTh',language);
 const d=v?(th?thDate(v):new Date(v+'T00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})):'';
 const m=el('div','meta');m.appendChild(el('span',null,$('ref').value.trim()?t.ref+$('ref').value.trim():''));m.appendChild(el('span',null,d));B.push(m);
-const mode=$('addresseeMode').value;const rcText=[nm,position,org,address].filter(Boolean).join('\n');
-// Team / Department letters can put the recipient block below the subject; an empty block is skipped so no gap is left.
-const below=mode==='team'&&$('rcptPos').value==='below'&&rcText,rc=el('div','rcpt',rcText),sj=el('div','subj',t.subj+fill(subject,language));
-if(below){sj.classList.add('subj-first');rc.classList.add('rcpt-after');B.push(sj,rc)}else B.push(rc,sj);
-const salutation=mode==='generic'?(th?'เรียน ผู้เกี่ยวข้อง':'To Whom It May Concern:'):mode==='team'?(th?'เรียน ฝ่ายที่เกี่ยวข้อง':'Dear Partnerships Team,'):t.dear+(nm||[position,org].filter(Boolean).join(' ')||t.fb)+t.dearEnd;const sp=el('p',null,salutation);sp.style.margin='0 0 3.2mm';B.push(sp);
+const mode=$('addresseeMode').value;
+// Team / Department with the recipient below the subject: the position and organisation go into the salutation
+// ("Dear MD of Lactasoy,") so the letter has a single greeting line. Only the address, if any, stays as its own block.
+const below=mode==='team'&&$('rcptPos').value==='below',rcText=(below?[address]:[nm,position,org,address]).filter(Boolean).join('\n');
+const rc=el('div','rcpt',rcText),sj=el('div','subj',t.subj+fill(subject,language));
+if(below&&rcText){sj.classList.add('subj-first');rc.classList.add('rcpt-after');B.push(sj,rc)}else B.push(rc,sj);
+const salutation=mode==='generic'?(th?'เรียน ผู้เกี่ยวข้อง':'To Whom It May Concern:'):below?t.dear+([position,org].filter(Boolean).join(' ')||(th?'ฝ่ายที่เกี่ยวข้อง':'Partnerships Team'))+t.dearEnd:mode==='team'?(th?'เรียน ฝ่ายที่เกี่ยวข้อง':'Dear Partnerships Team,'):t.dear+(nm||[position,org].filter(Boolean).join(' ')||t.fb)+t.dearEnd;const sp=el('p',null,salutation);sp.style.margin='0 0 3.2mm';B.push(sp);
 B.push(...paras(body,language));
 if(enc)B.push(el('div','enc',t.enc+enc));
 const g=el('div','sign');g.appendChild(el('div',null,t.close));const rw=el('div','row');
